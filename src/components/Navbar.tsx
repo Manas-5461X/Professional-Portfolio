@@ -8,7 +8,8 @@ import { scrollToElement, scrollToTopImmediate, stopScroll, startScroll } from '
 const NAV_LINKS = [
   { label: 'About', hash: '#about' },
   { label: 'Projects', hash: '#projects' },
-  { label: 'Technical Index', hash: '#work' },
+  { label: 'Index', hash: '#skills' },
+  { label: 'Exploring', hash: '#exploring' },
   { label: 'Contact', hash: '#contact' }
 ] as const;
 

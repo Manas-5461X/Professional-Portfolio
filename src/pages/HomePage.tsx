@@ -25,6 +25,19 @@ export function HomePage() {
   useScrollReveals(containerRef);
 
   useEffect(() => {
+    const refreshTimer = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+    const secondTimer = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 800);
+    return () => {
+      window.clearTimeout(refreshTimer);
+      window.clearTimeout(secondTimer);
+    };
+  }, []);
+
+  useEffect(() => {
     if (location.hash) {
       const target = location.hash;
       const timer = window.setTimeout(() => {

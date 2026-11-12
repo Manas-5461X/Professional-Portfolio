@@ -45,15 +45,17 @@ export function useScrollReveals(scopeRef: RefObject<HTMLElement | null>): void 
       if (isReducedMotion()) return;
       const blocks = gsap.utils.toArray<HTMLElement>('[data-reveal]');
       blocks.forEach((el) => {
+        const delay = parseFloat(el.dataset.delay || '0');
         gsap.from(el, {
-          y: 32,
-          opacity: 0,
+          y: 36,
+          autoAlpha: 0,
           duration: 0.9,
           ease: 'expo.out',
-          clearProps: 'transform,opacity',
+          delay,
+          clearProps: 'transform',
           scrollTrigger: {
             trigger: el,
-            start: 'top 90%',
+            start: 'top 88%',
             once: true
           }
         });

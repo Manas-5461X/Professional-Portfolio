@@ -1,20 +1,117 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { useGSAP } from '@gsap/react';
 import { CURRENTLY_EXPLORING, SKILL_CATEGORIES, type SkillMaturity } from '../content/skills';
+import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export function SkillsSection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const rowsContainerRef = useRef<HTMLDivElement | null>(null);
+  const exploringRef = useRef<HTMLDivElement | null>(null);
   const [maturityFilter, setMaturityFilter] = useState<'all' | SkillMaturity>('all');
   const totalSkills = SKILL_CATEGORIES.reduce((acc, cat) => acc + cat.items.length, 0);
 
+  // Entrance animations on scroll into Technical Index & Currently Exploring
+  useGSAP(
+    () => {
+      if (isReducedMotion()) return;
+
+      // Section header entrance
+      gsap.from('[data-skills-header]', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 82%',
+          once: true
+        }
+      });
+
+      // Category rows entrance with stagger
+      gsap.from('.skill-category-row', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.75,
+        stagger: 0.08,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%',
+          once: true
+        }
+      });
+
+      // Dedicated Currently Exploring header
+      gsap.from('[data-exploring-header]', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: exploringRef.current,
+          start: 'top 85%',
+          once: true
+        }
+      });
+
+      // Exploring topic cards with stagger
+      gsap.from('.exploring-card', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: exploringRef.current,
+          start: 'top 85%',
+          once: true
+        }
+      });
+    },
+    { scope: sectionRef }
+  );
+
+  const handleFilterClick = (tabId: 'all' | SkillMaturity) => {
+    setMaturityFilter(tabId);
+    if (!isReducedMotion() && rowsContainerRef.current) {
+      window.requestAnimationFrame(() => {
+        if (!rowsContainerRef.current) return;
+        const rows = rowsContainerRef.current.querySelectorAll('.skill-category-row');
+        if (!rows.length) return;
+        gsap.fromTo(
+          rows,
+          { autoAlpha: 0, y: 16 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            stagger: 0.04,
+            ease: 'expo.out',
+            clearProps: 'transform,opacity,visibility'
+          }
+        );
+      });
+    }
+  };
+
   return (
     <section
+      ref={sectionRef}
       id="skills"
       aria-labelledby="skills-heading"
-      className="border-b border-[var(--line)] bg-[var(--surface-subtle)]/40 py-16 sm:py-24"
+      className="scroll-mt-20 border-b border-[var(--line)] bg-[var(--surface-subtle)]/40 py-16 sm:py-24"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-6 border-b border-[var(--line)] pb-8 md:flex-row md:items-end">
+        <div data-skills-header className="flex flex-col justify-between gap-6 border-b border-[var(--line)] pb-8 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
               Technical Index
@@ -39,7 +136,7 @@ export function SkillsSection() {
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setMaturityFilter(tab.id as 'all' | SkillMaturity)}
+                  onClick={() => handleFilterClick(tab.id as 'all' | SkillMaturity)}
                   aria-pressed={active}
                   className={`btn-tactile min-h-[44px] rounded-md border px-3.5 text-xs font-medium ${
                     active
@@ -66,8 +163,8 @@ export function SkillsSection() {
           </span>
         </div>
 
-        {/* 7-category typographic ledger without SaaS card boxes */}
-        <div className="mt-6 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+        {/* 7-category typographic ledger */}
+        <div ref={rowsContainerRef} className="mt-6 divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {SKILL_CATEGORIES.map((category) => {
             const visibleItems =
               maturityFilter === 'all'
@@ -79,8 +176,7 @@ export function SkillsSection() {
             return (
               <div
                 key={category.id}
-                data-reveal
-                className="grid grid-cols-1 gap-5 py-7 lg:grid-cols-12 lg:gap-10"
+                className="skill-category-row grid grid-cols-1 gap-5 py-7 lg:grid-cols-12 lg:gap-10"
               >
                 <div className="lg:col-span-4">
                   <span className="font-mono text-xs text-[var(--muted)]">{category.index}</span>
@@ -139,8 +235,8 @@ export function SkillsSection() {
         </div>
 
         {/* Dedicated Currently Exploring band with typographic columns */}
-        <div id="exploring" className="mt-14">
-          <div className="flex flex-col justify-between gap-2 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end">
+        <div ref={exploringRef} id="exploring" className="scroll-mt-24 mt-14">
+          <div data-exploring-header className="flex flex-col justify-between gap-2 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">Currently Exploring</p>
               <h3 className="mt-2 text-xl font-semibold text-[var(--fg)]">
@@ -152,7 +248,7 @@ export function SkillsSection() {
 
           <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
             {CURRENTLY_EXPLORING.map((topic, idx) => (
-              <article key={topic.topic} data-reveal className="flex flex-col justify-between border-b border-[var(--line)] pb-5">
+              <article key={topic.topic} className="exploring-card flex flex-col justify-between border-b border-[var(--line)] pb-5">
                 <div>
                   <span className="font-mono text-[11px] text-[var(--muted)]">0{idx + 1}</span>
                   <h4 className="mt-1 text-base font-semibold text-[var(--fg)]">{topic.topic}</h4>
@@ -180,4 +276,3 @@ export function SkillsSection() {
     </section>
   );
 }
-

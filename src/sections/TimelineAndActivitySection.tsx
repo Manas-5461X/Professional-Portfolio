@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { useGSAP } from '@gsap/react';
 import { GITHUB_ACTIVITY, type ContributionDay, type GitHubActivityData } from '../content/github';
 import { PROFILE, TIMELINE, VERIFIED_MILESTONES } from '../content/profile';
+import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 function getCellClass(count: number): string {
   if (count === 0) return 'bg-[var(--surface-subtle)] border-[var(--line)]';
@@ -12,6 +16,11 @@ function getCellClass(count: number): string {
 }
 
 export function TimelineAndActivitySection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const timelineListRef = useRef<HTMLOListElement | null>(null);
+  const githubRef = useRef<HTMLDivElement | null>(null);
+  const milestonesRef = useRef<HTMLDivElement | null>(null);
+
   const [activity, setActivity] = useState<GitHubActivityData>(GITHUB_ACTIVITY);
   const [isLive, setIsLive] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
@@ -140,12 +149,112 @@ export function TimelineAndActivitySection() {
     };
   }, []);
 
+  // Entrance animations on scroll into Development Journey & GitHub Activity
+  useGSAP(
+    () => {
+      if (isReducedMotion()) return;
+
+      // Development Journey left column header
+      gsap.from('[data-journey-header]', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 82%',
+          once: true
+        }
+      });
+
+      // Timeline entries staggered cascade
+      gsap.from('.timeline-entry', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.75,
+        stagger: 0.1,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%',
+          once: true
+        }
+      });
+
+      // Public GitHub Activity header & profile button
+      gsap.from('[data-github-header]', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: githubRef.current,
+          start: 'top 85%',
+          once: true
+        }
+      });
+
+      // GitHub Stats Grid
+      gsap.from('.github-stat-item', {
+        y: 28,
+        autoAlpha: 0,
+        duration: 0.65,
+        stagger: 0.08,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: githubRef.current,
+          start: 'top 82%',
+          once: true
+        }
+      });
+
+      // Contribution Matrix
+      gsap.from('[data-github-matrix]', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-github-matrix]',
+          start: 'top 85%',
+          once: true
+        }
+      });
+
+      // Verified Highlights milestones
+      gsap.from('.milestone-card', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.75,
+        stagger: 0.1,
+        ease: 'expo.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: milestonesRef.current,
+          start: 'top 88%',
+          once: true
+        }
+      });
+    },
+    { scope: sectionRef }
+  );
+
   return (
-    <section id="activity" aria-labelledby="activity-heading" className="border-b border-[var(--line)] py-16 sm:py-24">
+    <section
+      ref={sectionRef}
+      id="activity"
+      aria-labelledby="activity-heading"
+      className="scroll-mt-20 border-b border-[var(--line)] py-16 sm:py-24"
+    >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Part 1: Editorial Development Journey */}
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-4">
+          <div data-journey-header className="lg:col-span-4">
             <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
               Development Journey
             </p>
@@ -158,12 +267,11 @@ export function TimelineAndActivitySection() {
           </div>
 
           <div className="lg:col-span-8">
-            <ol className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+            <ol ref={timelineListRef} className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
               {TIMELINE.map((entry) => (
                 <li
                   key={`${entry.period}-${entry.title}`}
-                  data-reveal
-                  className="grid grid-cols-1 gap-2 py-5 sm:grid-cols-12 sm:gap-6"
+                  className="timeline-entry grid grid-cols-1 gap-2 py-5 sm:grid-cols-12 sm:gap-6"
                 >
                   <div className="sm:col-span-4">
                     <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
@@ -185,8 +293,8 @@ export function TimelineAndActivitySection() {
         </div>
 
         {/* Part 2: GitHub Open-Source Logbook */}
-        <div data-reveal className="mt-16 border-t border-[var(--line)] pt-12">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div ref={githubRef} className="mt-16 border-t border-[var(--line)] pt-12">
+          <div data-github-header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
                 Public GitHub Activity
@@ -229,7 +337,7 @@ export function TimelineAndActivitySection() {
               },
               { label: 'Total Repository Stars', value: String(activity.totalStars) }
             ].map((stat) => (
-              <div key={stat.label}>
+              <div key={stat.label} className="github-stat-item">
                 <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">{stat.label}</dt>
                 <dd className="mt-1.5 text-lg font-semibold text-[var(--fg)] tabular-nums sm:text-xl">
                   {stat.value}
@@ -238,7 +346,7 @@ export function TimelineAndActivitySection() {
             ))}
           </dl>
 
-          <div className="mt-6">
+          <div data-github-matrix className="mt-6">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
               <span className="font-mono text-[var(--muted)]">
                 53-Week Contribution Matrix · Longest streak: {activity.longestStreak.length} days · Peak day:{' '}
@@ -284,7 +392,7 @@ export function TimelineAndActivitySection() {
         </div>
 
         {/* Part 3: Verified Facts Ledger */}
-        <div className="mt-14 border-t border-[var(--line)] pt-10">
+        <div ref={milestonesRef} className="mt-14 border-t border-[var(--line)] pt-10">
           <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">Verified Highlights</p>
@@ -296,7 +404,7 @@ export function TimelineAndActivitySection() {
 
           <div className="mt-6 grid grid-cols-1 gap-8 border-t border-[var(--line)] pt-6 sm:grid-cols-2 lg:grid-cols-4">
             {VERIFIED_MILESTONES.map((item) => (
-              <article key={item.id} data-reveal className="flex flex-col justify-between">
+              <article key={item.id} className="milestone-card flex flex-col justify-between">
                 <div>
                   <span className="font-mono text-2xl font-semibold text-[var(--accent)] tabular-nums">
                     {item.metric}
@@ -325,4 +433,3 @@ export function TimelineAndActivitySection() {
     </section>
   );
 }
-
