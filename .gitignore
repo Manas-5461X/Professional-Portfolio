@@ -35,3 +35,14 @@ skills/
 scratch/
 tmp/
 *.tmp
+
+# Skill instruction markdown files (kept locally, ignored from git)
+accessibility-compliance-accessibility-audit.md
+brainstorming.md
+figma-designer.md
+frontend-design.md
+landing-page-design.md
+portfolio-design.md
+seo-audit.md
+systematic-debugging.md
+web-project-brainstorming.md
