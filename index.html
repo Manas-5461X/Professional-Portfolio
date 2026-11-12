@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manas Gandhi | Software, AI/ML & Security Engineering Portfolio</title>
+    <meta
+      name="description"
+      content="Portfolio of Manas Gandhi, a Computer Science undergraduate building across full-stack software engineering, applied AI/ML, and security tooling: DevGuard Pro, CodeForensics, DPI Engine, and SecScan.io."
+    />
+    <meta name="author" content="Manas Gandhi" />
+    <meta name="theme-color" content="#EEEAE2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Manas Gandhi | Developer Portfolio" />
+    <meta
+      property="og:description"
+      content="Computer Science undergraduate building across AI/ML, frontend and backend engineering, and cybersecurity. Explore DevGuard Pro, CodeForensics, DPI Engine, and SecScan.io."
+    />
+    <meta property="og:image" content="/og-image.svg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Manas Gandhi | Developer Portfolio" />
+    <meta
+      name="twitter:description"
+      content="Building across code, intelligence, and security. Explore DevGuard Pro, CodeForensics, DPI Engine, and SecScan.io."
+    />
+    <meta name="twitter:image" content="/og-image.svg" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mg-portfolio-theme');
+          var theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.dataset.theme = theme;
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Manas Gandhi",
+        "email": "mailto:manas.devx@gmail.com",
+        "description": "Computer Science undergraduate (2025-2029) exploring AI/ML, full-stack software engineering, cybersecurity, and network analysis.",
+        "sameAs": [
+          "https://github.com/Manas-5461X",
+          "https://www.linkedin.com/in/manas-gandhi-09a341375/"
+        ],
+        "knowsAbout": [
+          "Software Engineering",
+          "Full-Stack Development",
+          "Artificial Intelligence and Machine Learning",
+          "Cybersecurity",
+          "Deep Packet Inspection",
+          "Static Code Analysis"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <main style="max-width: 720px; margin: 48px auto; padding: 0 24px; font-family: system-ui, sans-serif; line-height: 1.6;">
+        <h1>Manas Gandhi: Software, AI/ML &amp; Security Engineering</h1>
+        <p>
+          Computer Science undergraduate (batch 2025 to 2029) building meaningful software products across AI/ML,
+          frontend and backend engineering, and cybersecurity.
+        </p>
+        <h2>Selected Projects</h2>
+        <ul>
+          <li><strong>DevGuard Pro</strong>: Developer security analyzer and dashboard with Monaco Editor, 34 heuristic rules, and Firebase persistence.</li>
+          <li><strong>CodeForensics</strong>: TypeScript monorepo for evidence-backed repository intelligence and AST code archaeology.</li>
+          <li><strong>DPI Engine</strong>: Multi-processed Python PCAP deep packet inspection engine with TLS SNI and HTTP Host classification.</li>
+          <li><strong>SecScan.io</strong>: Full-stack GitHub security scanner for secrets, OSV npm CVEs, and config risks.</li>
+        </ul>
+        <p>
+          Contact: <a href="mailto:manas.devx@gmail.com">manas.devx@gmail.com</a> |
+          <a href="https://github.com/Manas-5461X">GitHub</a> |
+          <a href="https://www.linkedin.com/in/manas-gandhi-09a341375/">LinkedIn</a>
+        </p>
+      </main>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
