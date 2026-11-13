@@ -40,11 +40,20 @@ export function HomePage() {
   useEffect(() => {
     if (location.hash) {
       const target = location.hash;
-      const timer = window.setTimeout(() => {
-        scrollToElement(target);
+      ScrollTrigger.refresh();
+      scrollToElement(target, -84, true);
+      const timer1 = window.setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 60);
-      return () => window.clearTimeout(timer);
+        scrollToElement(target, -84, true);
+      }, 80);
+      const timer2 = window.setTimeout(() => {
+        ScrollTrigger.refresh();
+        scrollToElement(target, -84, true);
+      }, 300);
+      return () => {
+        window.clearTimeout(timer1);
+        window.clearTimeout(timer2);
+      };
     } else {
       scrollToTopImmediate();
       ScrollTrigger.refresh();

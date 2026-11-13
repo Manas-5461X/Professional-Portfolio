@@ -154,6 +154,7 @@ export function ProjectCaseStudyPage() {
         <div className="p-hero-top mono z-10">
           <Link
             to="/#work"
+            data-no-curtain
             className="ulink inline-flex items-center gap-2 text-xs text-[var(--muted)] hover:text-[var(--accent)]"
           >
             <ArrowLeft size={13} aria-hidden="true" />
@@ -201,6 +202,7 @@ export function ProjectCaseStudyPage() {
 
               <Link
                 to="/#work"
+                data-no-curtain
                 className={`pill text-xs sm:text-sm ${project.liveUrl ? 'p-hero-action-full' : ''}`}
               >
                 All my work <span className="arrow">&#8599;</span>

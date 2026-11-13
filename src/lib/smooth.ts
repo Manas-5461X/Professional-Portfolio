@@ -68,9 +68,18 @@ export function scrollToTopImmediate(): void {
   }
 }
 
-export function scrollToElement(target: string | HTMLElement, offset = -84): void {
+export function scrollToElement(target: string | HTMLElement, offset = -84, immediate = false): void {
   const el = typeof target === 'string' ? document.querySelector<HTMLElement>(target) : target;
   if (!el) return;
+  if (immediate) {
+    if (lenisInstance) {
+      lenisInstance.scrollTo(el, { offset, immediate: true, force: true });
+    } else {
+      const top = el.getBoundingClientRect().top + window.scrollY + offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'instant' as ScrollBehavior });
+    }
+    return;
+  }
   if (lenisInstance && !isReducedMotion()) {
     lenisInstance.scrollTo(el, {
       offset,

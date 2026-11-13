@@ -57,6 +57,11 @@ export function RouteCurtain() {
         return;
       }
 
+      // If link explicitly opts out of curtain, or has a target section hash (e.g. /#skills, /#work), navigate directly
+      if (target.closest('[data-no-curtain]') || targetHash) {
+        return;
+      }
+
       // Check if this navigation involves a route transition (projects, exploring, or back to home)
       const isTargetProject = targetPath.startsWith('/projects/');
       const isCurrentProject = currentPath.startsWith('/projects/');

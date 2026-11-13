@@ -84,6 +84,7 @@ export function ExploringPage() {
           <div className="mb-6">
             <Link
               to="/#skills"
+              data-no-curtain
               className="inline-flex items-center gap-2 font-mono text-xs text-[var(--muted)] transition-colors hover:text-[var(--accent)]"
             >
               <ArrowLeft size={14} aria-hidden="true" />
@@ -237,14 +238,16 @@ export function ExploringPage() {
         <div className="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--line)] pt-8">
           <Link
             to="/#skills"
+            data-no-curtain
             className="btn-tactile inline-flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-2.5 font-mono text-xs font-medium text-[var(--fg)] hover:border-[var(--line-strong)]"
           >
             <ArrowLeft size={14} />
-            <span>Return to Portfolio</span>
+            <span>Back to Technical Index</span>
           </Link>
 
           <Link
             to="/#contact"
+            data-no-curtain
             className="btn-tactile inline-flex items-center gap-2 rounded-lg border border-[var(--accent)] bg-[var(--accent-tint)] px-4 py-2.5 font-mono text-xs font-medium text-[var(--accent)] hover:opacity-90"
           >
             <span>Have thoughts or ideas? Get in touch</span>
