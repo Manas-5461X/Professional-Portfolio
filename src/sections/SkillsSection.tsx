@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from '@phosphor-icons/react';
+import { ArrowUpRight, CaretDown, CaretLeft, CaretRight, Pause, Play } from '@phosphor-icons/react';
 import { useGSAP } from '@gsap/react';
 import { CURRENTLY_EXPLORING, SKILL_CATEGORIES, type SkillMaturity } from '../content/skills';
 import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
@@ -11,8 +11,85 @@ export function SkillsSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const rowsContainerRef = useRef<HTMLDivElement | null>(null);
   const exploringRef = useRef<HTMLDivElement | null>(null);
+  const pillsScrollRef = useRef<HTMLDivElement | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const [maturityFilter, setMaturityFilter] = useState<'all' | SkillMaturity>('all');
+  const [mobileCategoryIdx, setMobileCategoryIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [rollAnim, setRollAnim] = useState<'rolling-in' | 'rolling-out-next' | 'rolling-out-prev'>('rolling-in');
+  const [isExploringExpandedMobile, setIsExploringExpandedMobile] = useState(false);
+
   const totalSkills = SKILL_CATEGORIES.reduce((acc, cat) => acc + cat.items.length, 0);
+
+  const resetResumeTimer = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 4500);
+  };
+
+  const goToCategory = (newIdx: number, direction: 'next' | 'prev') => {
+    if (newIdx === mobileCategoryIdx) return;
+    setRollAnim(direction === 'next' ? 'rolling-out-next' : 'rolling-out-prev');
+    setTimeout(() => {
+      setMobileCategoryIdx(newIdx);
+      setRollAnim('rolling-in');
+    }, 160);
+  };
+
+  // Mobile 3D auto-roll timer
+  useEffect(() => {
+    if (isPaused || isReducedMotion()) return;
+    const interval = setInterval(() => {
+      setRollAnim('rolling-out-next');
+      setTimeout(() => {
+        setMobileCategoryIdx((prev) => (prev + 1) % SKILL_CATEGORIES.length);
+        setRollAnim('rolling-in');
+      }, 160);
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [isPaused, mobileCategoryIdx]);
+
+  // Keep active category pill scrolled into view on mobile
+  useEffect(() => {
+    if (!pillsScrollRef.current) return;
+    const activeBtn = pillsScrollRef.current.children[mobileCategoryIdx] as HTMLElement | undefined;
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [mobileCategoryIdx]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    resetResumeTimer();
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        goToCategory((mobileCategoryIdx + 1) % SKILL_CATEGORIES.length, 'next');
+      } else {
+        goToCategory((mobileCategoryIdx - 1 + SKILL_CATEGORIES.length) % SKILL_CATEGORIES.length, 'prev');
+      }
+    }
+  };
+
+  const activeCategory = SKILL_CATEGORIES[mobileCategoryIdx] || SKILL_CATEGORIES[0];
+  const activeCategoryVisibleItems =
+    maturityFilter === 'all'
+      ? activeCategory.items
+      : activeCategory.items.filter((item) => item.maturity === maturityFilter);
 
   // Entrance animations on scroll into Technical Index & Currently Exploring
   useGSAP(
@@ -151,8 +228,8 @@ export function SkillsSection() {
           </div>
         </div>
 
-        {/* Typography-driven legend */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs text-[var(--muted)]">
+        {/* Typography-driven legend (Desktop) */}
+        <div className="mt-5 hidden sm:flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs text-[var(--muted)]">
           <span className="inline-flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[var(--status-live-fg)]" aria-hidden="true" />
             <span>Applied in projects</span>
@@ -163,8 +240,144 @@ export function SkillsSection() {
           </span>
         </div>
 
-        {/* 7-category typographic ledger */}
-        <div ref={rowsContainerRef} className="mt-6 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+        {/* Mobile 3D Mechanical Tumbler / Rolling Card */}
+        <div className="sm:hidden mt-6 space-y-4">
+          {/* Category Pill Track (horizontal scroll with smooth center alignment) */}
+          <div
+            ref={pillsScrollRef}
+            className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none [mask-image:linear-gradient(to_right,black_85%,transparent)]"
+          >
+            {SKILL_CATEGORIES.map((cat, idx) => {
+              const isActive = idx === mobileCategoryIdx;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    setIsPaused(true);
+                    resetResumeTimer();
+                    goToCategory(idx, idx > mobileCategoryIdx ? 'next' : 'prev');
+                  }}
+                  className={`btn-tactile shrink-0 rounded-full px-3 py-1 font-mono text-[11px] font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'border border-[var(--accent)] bg-[var(--accent-tint)] text-[var(--accent)] shadow-sm'
+                      : 'border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]'
+                  }`}
+                >
+                  <span className="opacity-60">{cat.index} </span>
+                  <span>{cat.title}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3D Tumbler Stage & Card */}
+          <div
+            className="skills-3d-stage relative"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => resetResumeTimer()}
+          >
+            {/* Auto-roll progress indicator line */}
+            <div className="relative h-0.5 w-full overflow-hidden rounded-full bg-[var(--line)]">
+              <div
+                key={mobileCategoryIdx}
+                className={`h-full bg-[var(--accent)] animate-roller-progress ${isPaused ? 'paused' : ''}`}
+              />
+            </div>
+
+            {/* Tumbler Card */}
+            <div
+              className={`skills-3d-card ${rollAnim} mt-2 rounded-xl border border-[var(--line-strong)] bg-[var(--surface)] p-5 shadow-sm`}
+            >
+              <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-semibold text-[var(--accent)]">
+                    {activeCategory.index}
+                  </span>
+                  <span className="font-mono text-[11px] text-[var(--muted)] uppercase tracking-wider">
+                    {activeCategory.id}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--muted)]">
+                  <span>{mobileCategoryIdx + 1}/{SKILL_CATEGORIES.length}</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsPaused((prev) => !prev)}
+                    className="p-1 text-[var(--fg-2)] hover:text-[var(--fg)]"
+                    aria-label={isPaused ? 'Resume auto-roll' : 'Pause auto-roll'}
+                  >
+                    {isPaused ? <Play size={12} weight="bold" /> : <Pause size={12} weight="bold" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <h3 className="text-base font-semibold text-[var(--fg)]">{activeCategory.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--muted)] line-clamp-2">
+                  {activeCategory.summary}
+                </p>
+              </div>
+
+              {/* Skills pills */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {activeCategoryVisibleItems.map((item) => (
+                  <span
+                    key={item.name}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-mono text-[11px] font-medium ${
+                      item.maturity === 'applied'
+                        ? 'border border-[var(--line-strong)] bg-[var(--surface-elevated,var(--surface))] text-[var(--fg)]'
+                        : 'border border-dashed border-[var(--accent)]/60 bg-[var(--accent-tint)]/40 text-[var(--accent)]'
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        item.maturity === 'applied' ? 'bg-[var(--status-live-fg)]' : 'border border-[var(--accent)]'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <span>{item.name}</span>
+                  </span>
+                ))}
+              </div>
+
+              {/* Tumbler mechanical controls & swipe hint */}
+              <div className="mt-4 flex items-center justify-between border-t border-[var(--line)] pt-3 text-[11px] text-[var(--muted)]">
+                <span className="font-mono text-[10px]">Swipe or tap to roll</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPaused(true);
+                      resetResumeTimer();
+                      goToCategory((mobileCategoryIdx - 1 + SKILL_CATEGORIES.length) % SKILL_CATEGORIES.length, 'prev');
+                    }}
+                    className="btn-tactile rounded border border-[var(--line)] p-1.5 text-[var(--fg-2)] hover:border-[var(--line-strong)]"
+                    aria-label="Previous category"
+                  >
+                    <CaretLeft size={12} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPaused(true);
+                      resetResumeTimer();
+                      goToCategory((mobileCategoryIdx + 1) % SKILL_CATEGORIES.length, 'next');
+                    }}
+                    className="btn-tactile rounded border border-[var(--line)] p-1.5 text-[var(--fg-2)] hover:border-[var(--line-strong)]"
+                    aria-label="Next category"
+                  >
+                    <CaretRight size={12} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 7-category typographic ledger (Desktop & Tablet) */}
+        <div ref={rowsContainerRef} className="mt-6 hidden sm:block divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {SKILL_CATEGORIES.map((category) => {
             const visibleItems =
               maturityFilter === 'all'
@@ -247,7 +460,31 @@ export function SkillsSection() {
             <span className="font-mono text-xs text-[var(--muted)]">Verified on GitHub</span>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
+          {/* Mobile Collapse Toggle */}
+          <div className="sm:hidden mt-4">
+            <button
+              type="button"
+              onClick={() => setIsExploringExpandedMobile((prev) => !prev)}
+              className="btn-tactile flex w-full items-center justify-between rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left font-mono text-xs text-[var(--fg-2)] hover:border-[var(--line-strong)]"
+            >
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full border border-[var(--accent)]" />
+                <span className="font-semibold text-[var(--fg)]">
+                  {isExploringExpandedMobile ? 'Hide Research Topics' : '+ Explore 4 Research Topics (Rust, Raft, eBPF)'}
+                </span>
+              </span>
+              <CaretDown
+                size={14}
+                className={`transform transition-transform duration-200 ${isExploringExpandedMobile ? 'rotate-180' : ''}`}
+              />
+            </button>
+          </div>
+
+          <div
+            className={`mt-6 grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2 ${
+              isExploringExpandedMobile ? 'block' : 'hidden sm:grid'
+            }`}
+          >
             {CURRENTLY_EXPLORING.map((topic, idx) => (
               <article key={topic.topic} className="exploring-card flex flex-col justify-between border-b border-[var(--line)] pb-5">
                 <div>
