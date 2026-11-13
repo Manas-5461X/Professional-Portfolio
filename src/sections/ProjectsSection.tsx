@@ -74,6 +74,35 @@ export function ProjectsSection() {
       };
     });
 
+    mm.add('(max-width: 1000px) and (prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.flag-mobile-header', {
+        y: 28,
+        autoAlpha: 0,
+        duration: 0.75,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '.flag-mobile-header',
+          start: 'top 88%',
+          once: true
+        }
+      });
+
+      gsap.from('.flag-card', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: trackEl,
+          start: 'top 88%',
+          once: true
+        }
+      });
+    });
+
     return () => mm.revert();
   }, []);
 

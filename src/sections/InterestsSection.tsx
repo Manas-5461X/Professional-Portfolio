@@ -1,16 +1,59 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { useGSAP } from '@gsap/react';
 import { AREAS_OF_INTEREST, type InterestTrack } from '../content/profile';
+import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export function InterestsSection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [activeId, setActiveId] = useState<InterestTrack['id']>('ai-ml');
   const activeTrack = AREAS_OF_INTEREST.find((t) => t.id === activeId) || AREAS_OF_INTEREST[0];
 
+  useGSAP(
+    () => {
+      if (isReducedMotion()) return;
+
+      gsap.from('[data-interests-header]', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-interests-header]',
+          start: 'top 88%',
+          once: true
+        }
+      });
+
+      gsap.from('[data-interests-pane]', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-interests-pane]',
+          start: 'top 88%',
+          once: true
+        }
+      });
+    },
+    { scope: sectionRef }
+  );
+
   return (
-    <section id="interests" aria-labelledby="interests-heading" className="hidden sm:block border-b border-[var(--line)] py-16 sm:py-24">
+    <section
+      ref={sectionRef}
+      id="interests"
+      aria-labelledby="interests-heading"
+      className="hidden sm:block border-b border-[var(--line)] py-16 sm:py-24"
+    >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-4 border-b border-[var(--line)] pb-8 sm:flex-row sm:items-end">
+        <div data-interests-header className="flex flex-col justify-between gap-4 border-b border-[var(--line)] pb-8 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">Areas of Interest</p>
             <h2 id="interests-heading" className="heading-section display-serif mt-3 max-w-xl text-[var(--fg)]">
@@ -23,7 +66,7 @@ export function InterestsSection() {
         </div>
 
         {/* Desktop interactive editorial index + reading pane */}
-        <div data-reveal className="mt-10 hidden grid-cols-12 gap-10 lg:grid">
+        <div data-interests-pane className="mt-10 hidden grid-cols-12 gap-10 lg:grid">
           <div
             role="tablist"
             aria-label="Engineering focus areas"

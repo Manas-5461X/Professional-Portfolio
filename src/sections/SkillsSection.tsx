@@ -53,32 +53,50 @@ export function SkillsSection() {
 
       // Section header entrance
       gsap.from('[data-skills-header]', {
-        y: 36,
+        y: 32,
         autoAlpha: 0,
-        duration: 0.85,
-        ease: 'expo.out',
+        duration: 0.8,
+        ease: 'power3.out',
         clearProps: 'transform,opacity,visibility',
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 82%',
+          trigger: '[data-skills-header]',
+          start: 'top 88%',
           once: true
         }
       });
 
-      // Category rows entrance with stagger (Desktop)
-      gsap.from('.skill-category-row', {
-        y: 32,
+      // Mobile Marquee entrance
+      gsap.from('[data-skills-marquee]', {
+        y: 28,
         autoAlpha: 0,
         duration: 0.75,
-        stagger: 0.08,
-        ease: 'expo.out',
+        ease: 'power3.out',
         clearProps: 'transform,opacity,visibility',
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
+          trigger: '[data-skills-marquee]',
+          start: 'top 90%',
           once: true
         }
       });
+
+      // Category rows entrance with batch on scroll (Desktop)
+      const rows = gsap.utils.toArray<HTMLElement>('.skill-category-row', sectionRef.current);
+      if (rows.length > 0) {
+        ScrollTrigger.batch(rows, {
+          start: 'top 90%',
+          once: true,
+          onEnter: (batch) => {
+            gsap.from(batch, {
+              y: 28,
+              autoAlpha: 0,
+              duration: 0.7,
+              stagger: 0.08,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity,visibility'
+            });
+          }
+        });
+      }
     },
     { scope: sectionRef }
   );
@@ -169,7 +187,7 @@ export function SkillsSection() {
         {/* ------------------------------------------------------------- */}
         {/* MOBILE ONLY: Automatic Continuous Marquee Ticker (Image 2 style) */}
         {/* ------------------------------------------------------------- */}
-        <div className="sm:hidden mt-8">
+        <div data-skills-marquee className="sm:hidden mt-8">
           <div className="mb-3 flex items-center justify-between">
             <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--accent)]">
               Tech Stack &amp; Tooling

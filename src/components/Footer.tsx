@@ -1,7 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { useGSAP } from '@gsap/react';
 import { PROFILE } from '../content/profile';
+import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'fallback' | 'error';
 
@@ -13,6 +17,7 @@ interface FormErrors {
 }
 
 export function Footer() {
+  const footerRef = useRef<HTMLElement | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
@@ -21,6 +26,52 @@ export function Footer() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<FormStatus>('idle');
   const [statusText, setStatusText] = useState('');
+
+  useGSAP(
+    () => {
+      if (isReducedMotion()) return;
+
+      gsap.from('[data-footer-heading]', {
+        y: 36,
+        autoAlpha: 0,
+        duration: 0.85,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-footer-heading]',
+          start: 'top 88%',
+          once: true
+        }
+      });
+
+      gsap.from('[data-footer-form]', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-footer-form]',
+          start: 'top 88%',
+          once: true
+        }
+      });
+
+      gsap.from('[data-footer-aside]', {
+        y: 32,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: {
+          trigger: '[data-footer-aside]',
+          start: 'top 88%',
+          once: true
+        }
+      });
+    },
+    { scope: footerRef }
+  );
 
   const validate = (): FormErrors => {
     const next: FormErrors = {};
@@ -128,18 +179,20 @@ export function Footer() {
   };
 
   return (
-    <footer id="contact" className="contact" aria-labelledby="contact-heading">
-      <p className="mono muted" style={{ marginBottom: '1.8rem' }}>
-        Hiring, collaborating, or just curious about one of the builds
-      </p>
+    <footer ref={footerRef} id="contact" className="contact" aria-labelledby="contact-heading">
+      <div data-footer-heading>
+        <p className="mono muted" style={{ marginBottom: '1.8rem' }}>
+          Hiring, collaborating, or just curious about one of the builds
+        </p>
 
-      <h2 id="contact-heading" className="contact-mail">
-        Say <span className="italic">hello.</span>
-      </h2>
+        <h2 id="contact-heading" className="contact-mail">
+          Say <span className="italic">hello.</span>
+        </h2>
+      </div>
 
       <div className="contact-grid">
         {/* Left Column: Minimal Underline Contact Form (Image 3 Parity) */}
-        <div>
+        <div data-footer-form>
           {status === 'success' ? (
             <div className="rounded-xl border border-white/20 bg-white/5 p-8" role="status">
               <span className="display h-md block text-[var(--paper)]">
@@ -298,7 +351,7 @@ export function Footer() {
         </div>
 
         {/* Right Column: Connect Cards & Quick Actions (Image 3 Parity) */}
-        <div className="contact-side">
+        <div data-footer-aside className="contact-side">
           <a
             href={PROFILE.linkedin}
             target="_blank"

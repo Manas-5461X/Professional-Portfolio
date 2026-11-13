@@ -173,68 +173,76 @@ export function TimelineAndActivitySection() {
 
       // Development Journey left column header
       gsap.from('[data-journey-header]', {
-        y: 36,
+        y: 32,
         autoAlpha: 0,
-        duration: 0.85,
-        ease: 'expo.out',
+        duration: 0.8,
+        ease: 'power3.out',
         clearProps: 'transform,opacity,visibility',
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 82%',
+          trigger: '[data-journey-header]',
+          start: 'top 88%',
           once: true
         }
       });
 
-      // Timeline entries staggered cascade
-      gsap.from('.timeline-entry', {
-        y: 32,
-        autoAlpha: 0,
-        duration: 0.75,
-        stagger: 0.1,
-        ease: 'expo.out',
-        clearProps: 'transform,opacity,visibility',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-          once: true
-        }
-      });
+      // Timeline entries progressive scroll reveal with batch
+      const timelineEntries = gsap.utils.toArray<HTMLElement>('.timeline-entry', sectionRef.current);
+      if (timelineEntries.length > 0) {
+        ScrollTrigger.batch(timelineEntries, {
+          start: 'top 88%',
+          once: true,
+          onEnter: (batch) => {
+            gsap.from(batch, {
+              y: 32,
+              autoAlpha: 0,
+              duration: 0.75,
+              stagger: 0.1,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity,visibility'
+            });
+          }
+        });
+      }
 
       // Public GitHub Activity header & profile button
       gsap.from('[data-github-header]', {
-        y: 36,
+        y: 32,
         autoAlpha: 0,
-        duration: 0.85,
-        ease: 'expo.out',
+        duration: 0.8,
+        ease: 'power3.out',
         clearProps: 'transform,opacity,visibility',
         scrollTrigger: {
-          trigger: githubRef.current,
-          start: 'top 85%',
+          trigger: '[data-github-header]',
+          start: 'top 88%',
           once: true
         }
       });
 
       // GitHub Stats Grid
-      gsap.from('.github-stat-item', {
-        y: 28,
-        autoAlpha: 0,
-        duration: 0.65,
-        stagger: 0.08,
-        ease: 'expo.out',
-        clearProps: 'transform,opacity,visibility',
-        scrollTrigger: {
-          trigger: githubRef.current,
-          start: 'top 82%',
-          once: true
-        }
-      });
+      const stats = gsap.utils.toArray<HTMLElement>('.github-stat-item', sectionRef.current);
+      if (stats.length > 0) {
+        ScrollTrigger.batch(stats, {
+          start: 'top 88%',
+          once: true,
+          onEnter: (batch) => {
+            gsap.from(batch, {
+              y: 24,
+              autoAlpha: 0,
+              duration: 0.65,
+              stagger: 0.08,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity,visibility'
+            });
+          }
+        });
+      }
 
       // Contribution Matrix
       gsap.from('[data-github-matrix]', {
-        y: 32,
+        y: 28,
         autoAlpha: 0,
         duration: 0.8,
-        ease: 'expo.out',
+        ease: 'power3.out',
         clearProps: 'transform,opacity,visibility',
         scrollTrigger: {
           trigger: '[data-github-matrix]',
@@ -244,19 +252,23 @@ export function TimelineAndActivitySection() {
       });
 
       // Verified Highlights milestones
-      gsap.from('.milestone-card', {
-        y: 32,
-        autoAlpha: 0,
-        duration: 0.75,
-        stagger: 0.1,
-        ease: 'expo.out',
-        clearProps: 'transform,opacity,visibility',
-        scrollTrigger: {
-          trigger: milestonesRef.current,
+      const milestones = gsap.utils.toArray<HTMLElement>('.milestone-card', sectionRef.current);
+      if (milestones.length > 0) {
+        ScrollTrigger.batch(milestones, {
           start: 'top 88%',
-          once: true
-        }
-      });
+          once: true,
+          onEnter: (batch) => {
+            gsap.from(batch, {
+              y: 32,
+              autoAlpha: 0,
+              duration: 0.75,
+              stagger: 0.1,
+              ease: 'power3.out',
+              clearProps: 'transform,opacity,visibility'
+            });
+          }
+        });
+      }
     },
     { scope: sectionRef }
   );
