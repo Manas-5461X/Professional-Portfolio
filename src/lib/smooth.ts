@@ -33,8 +33,12 @@ export function initSmoothScroll(): () => void {
   }
 
   lenisInstance = new Lenis({
-    lerp: 0.085,
-    smoothWheel: true
+    duration: 1.15,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Darkroom exponential curve
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1.0
   });
 
   lenisInstance.on('scroll', (e: { velocity: number; scroll: number }) => {

@@ -135,6 +135,7 @@ export function ProjectsSection() {
           ref={trackRef}
           onScroll={handleTrackScroll}
           className="flag-track"
+          data-lenis-prevent
         >
           {/* Section Introduction Column (Desktop Only >= 1001px) */}
           <div className="flag-intro hidden lg:flex">
