@@ -185,7 +185,7 @@ export function SkillsSection() {
               {[...MARQUEE_TRACK_1, ...MARQUEE_TRACK_1].map((skill, i) => (
                 <div
                   key={`t1-${skill.name}-${i}`}
-                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-xs shrink-0"
+                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-sm shrink-0"
                 >
                   <TechLogo name={skill.name} className="h-4 w-4 shrink-0" />
                   <span className="font-mono text-xs font-medium text-[var(--fg)] whitespace-nowrap">
@@ -200,7 +200,7 @@ export function SkillsSection() {
               {[...MARQUEE_TRACK_2, ...MARQUEE_TRACK_2].map((skill, i) => (
                 <div
                   key={`t2-${skill.name}-${i}`}
-                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-xs shrink-0"
+                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-sm shrink-0"
                 >
                   <TechLogo name={skill.name} className="h-4 w-4 shrink-0" />
                   <span className="font-mono text-xs font-medium text-[var(--fg)] whitespace-nowrap">
