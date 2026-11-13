@@ -16,11 +16,24 @@ export function ProjectsSection() {
   const pinRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | ProjectDiscipline>('all');
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const filteredProjects = useMemo(() => {
     if (activeFilter === 'all') return PROJECTS;
     return PROJECTS.filter((p) => p.discipline === activeFilter);
   }, [activeFilter]);
+
+  // Track horizontal scroll progress on mobile
+  const handleTrackScroll = () => {
+    const el = trackRef.current;
+    if (!el || window.innerWidth > 1000) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll <= 0) {
+      setScrollProgress(0);
+      return;
+    }
+    setScrollProgress(el.scrollLeft / maxScroll);
+  };
 
   // Horizontal pinned camera pan for Flagships on desktop
   useEffect(() => {
@@ -67,7 +80,10 @@ export function ProjectsSection() {
 
   const handleManualPan = (direction: 'next' | 'prev') => {
     if (!trackRef.current) return;
-    const scrollAmount = window.innerWidth * 0.72;
+    const isMobile = window.innerWidth <= 1000;
+    const scrollAmount = isMobile
+      ? trackRef.current.clientWidth * 0.88
+      : window.innerWidth * 0.72;
     trackRef.current.scrollBy({
       left: direction === 'next' ? scrollAmount : -scrollAmount,
       behavior: 'smooth'
@@ -79,11 +95,49 @@ export function ProjectsSection() {
       <span id="work" className="sr-only" />
       {/* =========================================================================
           Flagship Showcase: Horizontal Pinned Experience on Desktop
+          Horizontal Touch-Snap Carousel on Mobile / Tablet
           ========================================================================= */}
       <div ref={pinRef} className="flag-pin">
-        <div ref={trackRef} className="flag-track">
-          {/* Section Introduction Column */}
-          <div className="flag-intro">
+        {/* Mobile / Tablet Section Header (< 1001px) */}
+        <div className="flag-mobile-header lg:hidden px-4 sm:px-6 mb-5">
+          <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
+            (02) Selected Projects
+          </span>
+          <h2 className="display-serif mt-2 text-3xl sm:text-4xl text-[var(--fg)]">
+            The builds I&apos;d <span className="italic text-[var(--accent)]">demo first.</span>
+          </h2>
+          <div className="mt-3.5 flex items-center justify-between">
+            <span className="font-mono text-xs text-[var(--muted)]">
+              Swipe to explore ({filteredProjects.length}) →
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleManualPan('prev')}
+                aria-label="Previous project"
+                className="btn-tactile flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--fg)] hover:border-[var(--accent)]"
+              >
+                <ArrowLeft size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleManualPan('next')}
+                aria-label="Next project"
+                className="btn-tactile flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--fg)] hover:border-[var(--accent)]"
+              >
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          ref={trackRef}
+          onScroll={handleTrackScroll}
+          className="flag-track"
+        >
+          {/* Section Introduction Column (Desktop Only >= 1001px) */}
+          <div className="flag-intro hidden lg:flex">
             <div>
               <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
                 (02) Selected Projects
@@ -233,12 +287,17 @@ export function ProjectsSection() {
           ))}
 
           {/* Spacer end cap */}
-          <div className="hidden lg:block w-4 shrink-0" aria-hidden="true" />
+          <div className="w-2 sm:w-4 shrink-0" aria-hidden="true" />
         </div>
 
-        {/* Horizontal Progress Bar Track */}
-        <div className="flag-progress" aria-hidden="true">
+        {/* Horizontal Progress Bar Track: Desktop (controlled by GSAP) */}
+        <div className="flag-progress hidden lg:block" aria-hidden="true">
           <i />
+        </div>
+
+        {/* Horizontal Progress Bar Track: Mobile (controlled by native swipe/scroll) */}
+        <div className="flag-progress-mobile lg:hidden" aria-hidden="true">
+          <i style={{ transform: `scaleX(${Math.max(0.12, scrollProgress)})` }} />
         </div>
       </div>
 

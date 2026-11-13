@@ -1306,36 +1306,68 @@ button:hover .arrow {
   .flag-pin {
     height: auto;
     overflow: visible;
-    padding-block: 3.5rem;
+    padding-block: 2.5rem 1.75rem;
   }
   .flag-track {
-    flex-direction: column;
-    width: auto;
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding-inline: 1rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
     transform: none !important;
-    gap: 2rem;
+  }
+  .flag-track::-webkit-scrollbar {
+    display: none;
   }
   .flag-intro {
     width: auto;
     gap: 1.5rem;
   }
   .flag-card {
-    width: 100%;
+    flex: 0 0 calc(100vw - 3.25rem);
+    max-width: 380px;
     height: auto;
     min-height: auto;
+    scroll-snap-align: center;
     grid-template-columns: 1fr;
+    border-radius: 20px;
   }
   .flag-card .visual {
     order: -1;
-    min-height: 260px;
+    min-height: 220px;
     padding: 1rem;
     border-left: none;
     border-bottom: 1px solid var(--line);
   }
   .flag-card .copy {
-    gap: 2rem;
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+  .flag-card .name {
+    font-size: 2.15rem;
   }
   .flag-progress {
     display: none;
+  }
+  .flag-progress-mobile {
+    margin: 1.25rem 1rem 0;
+    height: 2px;
+    background: var(--line);
+    position: relative;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .flag-progress-mobile i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    transform-origin: left;
+    transition: transform 0.12s ease-out;
   }
   .row {
     grid-template-columns: 1fr auto;
