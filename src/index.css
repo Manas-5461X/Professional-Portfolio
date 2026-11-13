@@ -764,6 +764,61 @@ button:hover .arrow {
   letter-spacing: -0.01em;
 }
 
+/* Flagship Card Actions: 1-line on mobile with icon-only buttons for GitHub & Live preview */
+.flag-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.flag-actions .pill-primary {
+  flex: 1;
+  min-width: 0;
+  height: 2.5rem;
+  padding: 0 0.85rem;
+}
+
+.flag-actions .pill-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.flag-actions .pill-text,
+.flag-actions .pill-arrow {
+  display: none !important;
+}
+
+@media (min-width: 640px) {
+  .flag-actions {
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+  }
+
+  .flag-actions .pill-primary {
+    flex: initial;
+    padding: 0 1.1rem;
+  }
+
+  .flag-actions .pill-icon {
+    width: auto;
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
+  .flag-actions .pill-text {
+    display: inline !important;
+  }
+
+  .flag-actions .pill-arrow {
+    display: inline-block !important;
+  }
+}
+
 .flag-progress {
   margin: 2rem var(--gutter) 0;
   height: 2px;

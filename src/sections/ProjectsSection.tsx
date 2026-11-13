@@ -177,28 +177,28 @@ export function ProjectsSection() {
                   </div>
                 </div>
 
-                {/* Bottom CTA Actions */}
-                <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-[var(--line)]">
+                {/* Bottom CTA Actions: 1-line on mobile with icon-only buttons for GitHub & Live preview */}
+                <div className="flag-actions mt-4 sm:mt-6">
                   <Link
                     to={`/projects/${project.slug}`}
-                    className="pill solid text-xs"
-                    style={{ height: '2.5rem', padding: '0 1.1rem' }}
+                    className="pill solid pill-primary text-xs"
                   >
-                    <span className="dot" />
-                    <span>View Case Study</span>
-                    <span className="arrow">&#8599;</span>
+                    <span className="dot shrink-0" />
+                    <span className="whitespace-nowrap">View Case Study</span>
+                    <span className="arrow shrink-0">&#8599;</span>
                   </Link>
 
                   <a
                     href={project.repoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="pill text-xs"
-                    style={{ height: '2.5rem', padding: '0 1rem' }}
+                    aria-label={`${project.name} GitHub Repository`}
+                    title={`${project.name} GitHub Repository`}
+                    className="pill pill-icon text-xs"
                   >
-                    <GithubLogo size={14} />
-                    <span>GitHub</span>
-                    <span className="arrow">&#8599;</span>
+                    <GithubLogo size={18} className="shrink-0" />
+                    <span className="pill-text">GitHub</span>
+                    <span className="arrow pill-arrow">&#8599;</span>
                   </a>
 
                   {project.liveUrl && (
@@ -206,12 +206,13 @@ export function ProjectsSection() {
                       href={project.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="pill text-xs"
-                      style={{ height: '2.5rem', padding: '0 1rem' }}
+                      aria-label={`${project.name} Live Application`}
+                      title={`${project.name} Live Application`}
+                      className="pill pill-icon text-xs"
                     >
-                      <Globe size={14} />
-                      <span>Live App</span>
-                      <span className="arrow">&#8599;</span>
+                      <Globe size={18} className="shrink-0" />
+                      <span className="pill-text">Live App</span>
+                      <span className="arrow pill-arrow">&#8599;</span>
                     </a>
                   )}
                 </div>
