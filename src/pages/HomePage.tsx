@@ -57,8 +57,12 @@ export function HomePage() {
     } else {
       scrollToTopImmediate();
       ScrollTrigger.refresh();
+      const timer = window.setTimeout(() => {
+        scrollToTopImmediate();
+      }, 50);
+      return () => window.clearTimeout(timer);
     }
-  }, [location.hash]);
+  }, [location.pathname, location.hash]);
 
   return (
     <div ref={containerRef}>

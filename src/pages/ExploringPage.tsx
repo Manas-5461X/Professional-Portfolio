@@ -83,12 +83,12 @@ export function ExploringPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="mb-6">
             <Link
-              to="/#skills"
+              to="/"
               data-no-curtain
               className="inline-flex items-center gap-2 font-mono text-xs text-[var(--muted)] transition-colors hover:text-[var(--accent)]"
             >
               <ArrowLeft size={14} aria-hidden="true" />
-              <span>Back to Technical Index</span>
+              <span>Back to main website</span>
             </Link>
           </div>
 
@@ -237,12 +237,12 @@ export function ExploringPage() {
         {/* Bottom Navigation */}
         <div className="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--line)] pt-8">
           <Link
-            to="/#skills"
+            to="/"
             data-no-curtain
             className="btn-tactile inline-flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-2.5 font-mono text-xs font-medium text-[var(--fg)] hover:border-[var(--line-strong)]"
           >
             <ArrowLeft size={14} />
-            <span>Back to Technical Index</span>
+            <span>Back to main website</span>
           </Link>
 
           <Link
