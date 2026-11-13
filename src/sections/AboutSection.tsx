@@ -31,6 +31,26 @@ export function AboutSection() {
                 <dd className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{PROFILE.education.focus}</dd>
               </div>
             </dl>
+
+            {/* Editorial Builder Blueprint Card */}
+            <figure className="mt-8 mx-auto max-w-sm lg:max-w-none overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-sm">
+              <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
+                <img
+                  src="/images/about-portrait.jpg"
+                  alt="Manas Gandhi — Systems, AI & Security builder illustration"
+                  loading="lazy"
+                  width={600}
+                  height={600}
+                  className="h-full w-full object-cover select-none transition-transform duration-500 hover:scale-[1.02]"
+                />
+              </div>
+              <figcaption className="mt-2.5 flex items-center justify-between px-1 font-mono text-[10px] text-[var(--muted)]">
+                <span className="font-semibold uppercase tracking-wider text-[var(--accent)]">
+                  FIG. 01 // BUILDER BLUEPRINT
+                </span>
+                <span className="tracking-wider text-[var(--muted)]">EST. 2026</span>
+              </figcaption>
+            </figure>
           </div>
 
           <div className="space-y-6 lg:col-span-8 lg:border-l lg:border-[var(--line)] lg:pl-10">
