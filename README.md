@@ -89,6 +89,4 @@ npx vercel
 ### Static Hosts (Netlify, GitHub Pages, S3)
 The build produces standard static assets in `dist/`. Ensure deep route fallbacks redirect to `/index.html`.
 
-## License
 
-MIT
