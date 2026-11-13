@@ -30,16 +30,27 @@ export function TimelineAndActivitySection() {
 
     async function loadLiveGitHub() {
       try {
+        const CACHE_TTL_MS = 10 * 60 * 1000; // 10-minute cache TTL
         const cached = sessionStorage.getItem('live_github_activity');
+
         if (cached) {
           try {
             const parsed = JSON.parse(cached);
-            if (!cancelled && parsed?.data) {
+            const isFresh = parsed?.timestamp && Date.now() - parsed.timestamp < CACHE_TTL_MS;
+            const isNotStale =
+              parsed?.data && parsed.data.totalContributions >= GITHUB_ACTIVITY.totalContributions;
+
+            if (isFresh && isNotStale && !cancelled) {
               setActivity(parsed.data);
               setIsLive(true);
               return;
+            } else {
+              // Expire stale cache so fresh live data is fetched immediately
+              sessionStorage.removeItem('live_github_activity');
             }
-          } catch {}
+          } catch {
+            sessionStorage.removeItem('live_github_activity');
+          }
         }
 
         const handle = PROFILE.handle || 'Manas-5461X';
@@ -112,6 +123,9 @@ export function TimelineAndActivitySection() {
             );
           }
 
+          const finalTotal = Math.max(total, GITHUB_ACTIVITY.totalContributions);
+          const finalActiveDays = Math.max(activeDays, GITHUB_ACTIVITY.activeDays);
+
           const liveData: GitHubActivityData = {
             username: handle,
             generatedAt: new Date().toISOString(),
@@ -119,9 +133,9 @@ export function TimelineAndActivitySection() {
               start: days[0]?.date || GITHUB_ACTIVITY.range.start,
               end: days[days.length - 1]?.date || GITHUB_ACTIVITY.range.end
             },
-            totalContributions: total,
-            activeDays,
-            avgPerActiveDay: Math.round((total / Math.max(1, activeDays)) * 10) / 10,
+            totalContributions: finalTotal,
+            activeDays: finalActiveDays,
+            avgPerActiveDay: Math.round((finalTotal / Math.max(1, finalActiveDays)) * 10) / 10,
             currentStreak: { length: currentStreak },
             longestStreak: { length: longestStreak },
             bestDay,
@@ -132,7 +146,10 @@ export function TimelineAndActivitySection() {
           };
 
           try {
-            sessionStorage.setItem('live_github_activity', JSON.stringify({ data: liveData }));
+            sessionStorage.setItem(
+              'live_github_activity',
+              JSON.stringify({ data: liveData, timestamp: Date.now() })
+            );
           } catch {}
 
           setActivity(liveData);
