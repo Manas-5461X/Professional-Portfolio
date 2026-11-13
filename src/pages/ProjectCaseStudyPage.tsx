@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { PROJECTS, PROJECT_BY_SLUG, type ProjectRecord } from '../content/projects';
@@ -28,7 +28,10 @@ export function ProjectCaseStudyPage() {
 
   useScrollReveals(containerRef);
 
+  const [activeShotIndex, setActiveShotIndex] = useState(0);
+
   useEffect(() => {
+    setActiveShotIndex(0);
     scrollToTopImmediate();
     ScrollTrigger.refresh();
   }, [slug]);
@@ -145,65 +148,111 @@ export function ProjectCaseStudyPage() {
       </div>
 
       <div className="mx-auto mt-12 max-w-6xl space-y-14 px-4 sm:px-6 lg:px-8">
-        {/* Verified Screenshots OR Verified CLI Capture */}
-        {project.screenshots.length > 0 && (
-          <section aria-labelledby="media-heading" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 id="media-heading" className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
-                Verified Application Screenshots
-              </h2>
-              <span className="font-mono text-xs text-[var(--muted)]">Captured directly from live Vercel deployment</span>
-            </div>
-
-            <div className={`grid grid-cols-1 gap-6 ${project.screenshots.length > 1 ? 'lg:grid-cols-2' : ''}`}>
-              {project.screenshots.map((shot) => (
-                <figure
-                  key={shot.src}
-                  className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)]"
-                >
-                  <div className="aspect-[16/10] overflow-hidden bg-[var(--surface-subtle)]">
-                    <img
-                      src={shot.src}
-                      alt={shot.alt}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover object-top"
-                    />
+        {/* Core Showcase: Side Media + Overview, Problem, Motivation & What I Built */}
+        <section aria-labelledby="overview-heading" className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
+          {/* Left Column: Compact Media Card (Screenshot / CLI Output) */}
+          <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
+            {project.screenshots.length > 0 && (
+              <figure className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] shadow-sm">
+                <div className="flex items-center justify-between border-b border-[var(--line)] bg-[var(--surface-subtle)] px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[var(--accent)]">
+                      Application Preview
+                    </span>
                   </div>
-                  <figcaption className="border-t border-[var(--line)] px-4 py-3 text-xs leading-relaxed text-[var(--fg-2)]">
-                    {shot.caption}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </section>
-        )}
+                  <span className="font-mono text-[10px] text-[var(--muted)]">Live Deployment</span>
+                </div>
 
-        {project.cliOutputPreview && (
-          <section aria-labelledby="cli-heading" className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 id="cli-heading" className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
-                Verified CLI Execution Output
-              </h2>
-              <span className="font-mono text-xs text-[var(--muted)]">{project.cliOutputPreview.note}</span>
-            </div>
-            <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[#0F172A] text-slate-100">
-              <div className="border-b border-slate-800 bg-[#111827] px-4 py-2.5 font-mono text-xs text-sky-300">
-                $ {project.cliOutputPreview.command}
+                <div className="aspect-[16/10] overflow-hidden bg-[var(--surface-subtle)]">
+                  <img
+                    src={project.screenshots[activeShotIndex]?.src || project.screenshots[0].src}
+                    alt={project.screenshots[activeShotIndex]?.alt || project.screenshots[0].alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover object-top transition-opacity duration-200"
+                  />
+                </div>
+
+                {project.screenshots.length > 1 && (
+                  <div className="flex items-center gap-1.5 border-t border-[var(--line)] bg-[var(--surface-subtle)]/60 p-2">
+                    {project.screenshots.map((shot, idx) => (
+                      <button
+                        key={shot.src}
+                        type="button"
+                        onClick={() => setActiveShotIndex(idx)}
+                        className={`flex-1 rounded-md px-2.5 py-1 font-mono text-[11px] transition-colors ${
+                          activeShotIndex === idx
+                            ? 'bg-[var(--accent)] text-white font-semibold'
+                            : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--line)]/50'
+                        }`}
+                      >
+                        View {idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <figcaption className="border-t border-[var(--line)] px-4 py-3 text-xs leading-relaxed text-[var(--fg-2)]">
+                  {project.screenshots[activeShotIndex]?.caption || project.screenshots[0].caption}
+                </figcaption>
+              </figure>
+            )}
+
+            {project.cliOutputPreview && (
+              <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[#0F172A] text-slate-100 shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-800 bg-[#111827] px-4 py-2.5">
+                  <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-sky-400">
+                    CLI Output
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400">{project.cliOutputPreview.note}</span>
+                </div>
+                <div className="border-b border-slate-800/80 bg-slate-900/60 px-4 py-2 font-mono text-xs text-sky-300">
+                  $ {project.cliOutputPreview.command}
+                </div>
+                <pre className="max-h-72 overflow-auto p-4 font-mono text-xs leading-relaxed text-slate-200">
+                  <code>{project.cliOutputPreview.output}</code>
+                </pre>
               </div>
-              <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-200">
-                <code>{project.cliOutputPreview.output}</code>
-              </pre>
-            </div>
-          </section>
-        )}
+            )}
 
-        {/* Overview, Problem, Motivation, Contribution */}
-        <section className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7">
+            {/* Quick Links Card */}
+            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)] block mb-3 font-semibold">
+                Project Resources
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={project.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pill text-xs h-9 px-3.5 inline-flex items-center gap-1.5"
+                >
+                  <span className="dot" /> GitHub Repo <span className="arrow">&#8599;</span>
+                </a>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pill solid text-xs h-9 px-3.5 inline-flex items-center gap-1.5"
+                  >
+                    Open Live Deployment <span className="arrow">&#8599;</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Overview, Problem, Motivation & What I Built */}
+          <div className="lg:col-span-7 space-y-6">
             <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="text-lg font-semibold text-[var(--fg)]">Overview</h2>
-              <p className="mt-2.5 text-sm leading-relaxed text-[var(--fg-2)] sm:text-base">{project.overview}</p>
+              <h2 id="overview-heading" className="text-lg font-semibold text-[var(--fg)]">
+                Overview
+              </h2>
+              <p className="mt-2.5 text-sm leading-relaxed text-[var(--fg-2)] sm:text-base">
+                {project.overview}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -233,34 +282,6 @@ export function ProjectCaseStudyPage() {
               </ul>
             </div>
           </div>
-
-          <aside className="space-y-6 lg:col-span-5">
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="text-base font-semibold text-[var(--fg)]">Verified Technology Stack</h2>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {project.stack.map((tech) => (
-                  <li
-                    key={tech}
-                    className="rounded-md border border-[var(--line)] bg-[var(--bg)] px-3 py-1 font-mono text-xs text-[var(--fg)]"
-                  >
-                    {tech}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="text-base font-semibold text-[var(--fg)]">Verified Snapshot Metrics</h2>
-              <dl className="mt-4 divide-y divide-[var(--line)]">
-                {project.verifiedHighlights.map((h) => (
-                  <div key={h.label} className="flex items-center justify-between py-2.5 text-sm">
-                    <dt className="text-[var(--muted)]">{h.label}</dt>
-                    <dd className="font-mono font-semibold text-[var(--fg)] tabular-nums">{h.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </aside>
         </section>
 
         {/* Architecture Workflow */}
