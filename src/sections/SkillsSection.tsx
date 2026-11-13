@@ -128,7 +128,7 @@ export function SkillsSection() {
             </p>
           </div>
 
-          <div role="group" aria-label="Filter skills by experience level" className="flex flex-wrap gap-2">
+          <div role="group" aria-label="Filter skills by experience level" className="hidden sm:flex flex-wrap gap-2">
             {[
               { id: 'all', label: `All (${totalSkills})` },
               { id: 'applied', label: 'Experienced / Applied' },
@@ -285,29 +285,6 @@ export function SkillsSection() {
               </div>
             );
           })}
-        </div>
-
-        {/* Dedicated Research Topics Discovery Card linking to /exploring */}
-        <div className="mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
-              Research &amp; Ongoing Study
-            </p>
-            <h3 className="mt-1 text-base sm:text-lg font-semibold text-[var(--fg)]">
-              Currently Exploring (4 Dedicated Study Tracks)
-            </h3>
-            <p className="mt-1 text-xs text-[var(--fg-2)] max-w-xl">
-              Deep-dives into ML from scratch, AST static analysis, and concurrent systems architectures backed by active public repositories.
-            </p>
-          </div>
-
-          <Link
-            to="/exploring"
-            className="btn-tactile inline-flex shrink-0 items-center gap-2 rounded-lg border border-[var(--line-strong)] bg-[var(--surface-elevated,var(--surface))] px-4 py-2.5 font-mono text-xs font-medium text-[var(--accent)] hover:border-[var(--accent)]"
-          >
-            <span>View Dedicated Exploring Page</span>
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
         </div>
       </div>
     </section>
