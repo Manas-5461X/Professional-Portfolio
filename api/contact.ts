@@ -1,3 +1,7 @@
+/**
+ * Serverless Contact Handler
+ * Validates inquiries, applies in-memory rate limiting, and dispatches via Nodemailer.
+ */
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import nodemailer from 'nodemailer';
 
@@ -164,4 +168,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     });
   }
 }
+
 
