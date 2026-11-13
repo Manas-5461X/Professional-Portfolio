@@ -25,7 +25,9 @@ export function useMeta({ title, description, path = '/' }: MetaOptions): void {
     setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', description);
 
-    const configuredSiteUrl = (import.meta.env.VITE_SITE_URL as string | undefined) || 'https://manasgandhi.pages.dev';
+    const configuredSiteUrl =
+      (import.meta.env.VITE_SITE_URL as string | undefined)?.trim() ||
+      (typeof window !== 'undefined' ? window.location.origin : '');
     if (configuredSiteUrl && configuredSiteUrl.trim().length > 0) {
       const normalizedBase = configuredSiteUrl.replace(/\/+$/, '');
       const normalizedPath = path.startsWith('/') ? path : `/${path}`;

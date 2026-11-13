@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   if (isRateLimited(ip)) {
     res.status(429).json({
       ok: false,
-      error: 'Too many messages sent recently. Please wait a few minutes or email manas.devx@gmail.com directly.'
+      error: 'Too many messages sent recently. Please wait a few minutes or use the direct email link.'
     });
     return;
   }
@@ -117,13 +117,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const smtpPort = Number(process.env.SMTP_PORT || '587');
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-  const contactTo = process.env.CONTACT_TO || 'manas.devx@gmail.com';
+  const contactTo = process.env.CONTACT_TO || process.env.SMTP_USER;
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
+  if (!smtpHost || !smtpUser || !smtpPass || !contactTo) {
     res.status(503).json({
       ok: false,
       fallbackMailto: true,
-      error: 'Direct email transport is not configured on this host. Please email manas.devx@gmail.com directly.'
+      error: 'Direct email transport is not configured on this host. Please use the direct mailto link.'
     });
     return;
   }
@@ -160,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     res.status(502).json({
       ok: false,
       fallbackMailto: true,
-      error: 'Unable to reach mail server right now. Please email manas.devx@gmail.com directly.'
+      error: 'Unable to reach mail server right now. Please use the direct email link.'
     });
   }
 }

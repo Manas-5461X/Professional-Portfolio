@@ -62,37 +62,40 @@ export function ContactSection() {
     setStatus('submitting');
     setStatusText('Sending your message...');
 
-    const web3Key =
-      (import.meta.env.VITE_WEB3FORMS_KEY as string | undefined) || 'ed78aa4b-33ae-4767-b72f-92d3ae26e585';
+    const web3Key = (import.meta.env.VITE_WEB3FORMS_KEY as string | undefined)?.trim();
 
     try {
       if (web3Key && web3Key.trim().length > 0) {
-        const web3Response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({
-            access_key: web3Key.trim(),
-            name: name.trim(),
-            email: email.trim(),
-            subject: subject.trim() || 'New Portfolio Contact Message',
-            message: message.trim(),
-            from_name: `${name.trim()} via Portfolio`,
-            botcheck: website
-          })
-        });
+        try {
+          const web3Response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({
+              access_key: web3Key.trim(),
+              name: name.trim(),
+              email: email.trim(),
+              subject: subject.trim() || 'New Portfolio Contact Message',
+              message: message.trim(),
+              from_name: `${name.trim()} via Portfolio`,
+              botcheck: website
+            })
+          });
 
-        const web3Data = (await web3Response.json()) as { success?: boolean; message?: string };
-        if (web3Response.ok && web3Data.success) {
-          setStatus('success');
-          setStatusText('Message delivered. Thank you for reaching out.');
-          setName('');
-          setEmail('');
-          setSubject('');
-          setMessage('');
-          return;
+          const web3Data = (await web3Response.json()) as { success?: boolean; message?: string };
+          if (web3Response.ok && web3Data.success) {
+            setStatus('success');
+            setStatusText('Message delivered. Thank you for reaching out.');
+            setName('');
+            setEmail('');
+            setSubject('');
+            setMessage('');
+            return;
+          }
+        } catch {
+          // Web3Forms endpoint blocked (e.g. CORS on localhost) or unavailable; fallback to server/mailto
         }
       }
 
@@ -126,7 +129,7 @@ export function ContactSection() {
       if (response.status === 503 || response.status === 404 || data.fallbackMailto) {
         setStatus('fallback');
         setStatusText(
-          'Direct email transport is not configured on this host. Use the pre-filled email action below to send directly to manas.devx@gmail.com.'
+          `Direct email transport is not configured on this host. Use the pre-filled email action below to send directly to ${PROFILE.email}.`
         );
         return;
       }
