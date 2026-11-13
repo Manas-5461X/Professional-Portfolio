@@ -16,23 +16,22 @@ export function ProjectsSection() {
   const pinRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | ProjectDiscipline>('all');
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressFillRef = useRef<HTMLElement>(null);
 
   const filteredProjects = useMemo(() => {
     if (activeFilter === 'all') return PROJECTS;
     return PROJECTS.filter((p) => p.discipline === activeFilter);
   }, [activeFilter]);
 
-  // Track horizontal scroll progress on mobile
+  // Track horizontal scroll progress on mobile directly without re-rendering component
   const handleTrackScroll = () => {
     const el = trackRef.current;
-    if (!el || window.innerWidth > 1000) return;
+    const bar = progressFillRef.current;
+    if (!el || !bar || window.innerWidth > 1000) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
-    if (maxScroll <= 0) {
-      setScrollProgress(0);
-      return;
-    }
-    setScrollProgress(el.scrollLeft / maxScroll);
+    if (maxScroll <= 0) return;
+    const progress = Math.min(1, Math.max(0.12, el.scrollLeft / maxScroll));
+    bar.style.transform = `scaleX(${progress})`;
   };
 
   // Horizontal pinned camera pan for Flagships on desktop
@@ -135,7 +134,6 @@ export function ProjectsSection() {
           ref={trackRef}
           onScroll={handleTrackScroll}
           className="flag-track"
-          data-lenis-prevent
         >
           {/* Section Introduction Column (Desktop Only >= 1001px) */}
           <div className="flag-intro hidden lg:flex">
@@ -298,7 +296,7 @@ export function ProjectsSection() {
 
         {/* Horizontal Progress Bar Track: Mobile (controlled by native swipe/scroll) */}
         <div className="flag-progress-mobile lg:hidden" aria-hidden="true">
-          <i style={{ transform: `scaleX(${Math.max(0.12, scrollProgress)})` }} />
+          <i ref={progressFillRef} style={{ transform: 'scaleX(0.12)' }} />
         </div>
       </div>
 
