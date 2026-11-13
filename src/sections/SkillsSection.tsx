@@ -1,6 +1,6 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { ArrowUpRight } from '@phosphor-icons/react';
 import { useGSAP } from '@gsap/react';
 import { SKILL_CATEGORIES, type SkillMaturity } from '../content/skills';
 import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
@@ -8,59 +8,43 @@ import { TechLogo } from '../components/TechLogos';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-interface FlatSkill {
-  name: string;
-  categoryId: string;
-  categoryTitle: string;
-  maturity: SkillMaturity;
-  evidence: string;
-  projectSlug?: string;
-}
+// Curated skills for the continuous mobile marquee ticker
+const MARQUEE_TRACK_1 = [
+  { name: 'React', label: 'React' },
+  { name: 'TypeScript', label: 'TypeScript' },
+  { name: 'Python', label: 'Python' },
+  { name: 'Tailwind CSS', label: 'Tailwind CSS' },
+  { name: 'Vite', label: 'Vite' },
+  { name: 'Firebase', label: 'Firebase' },
+  { name: 'Docker', label: 'Docker' },
+  { name: 'PostgreSQL', label: 'PostgreSQL' },
+  { name: 'C++', label: 'C++' },
+  { name: 'Git', label: 'Git' },
+  { name: 'OpenCV', label: 'OpenCV' },
+  { name: 'REST APIs', label: 'REST APIs' }
+];
+
+const MARQUEE_TRACK_2 = [
+  { name: 'JavaScript', label: 'JavaScript' },
+  { name: 'HTML', label: 'HTML5' },
+  { name: 'CSS', label: 'CSS3' },
+  { name: 'Java', label: 'Java' },
+  { name: 'Supabase', label: 'Supabase' },
+  { name: 'Linux', label: 'Linux' },
+  { name: 'GitHub', label: 'GitHub' },
+  { name: 'VS Code', label: 'VS Code' },
+  { name: 'Postman', label: 'Postman' },
+  { name: 'Computer Networks', label: 'Networks & PCAP' },
+  { name: 'SQL', label: 'Database & SQL' },
+  { name: 'AI application development', label: 'Applied AI & LLMs' }
+];
 
 export function SkillsSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const rowsContainerRef = useRef<HTMLDivElement | null>(null);
-  const scrollTrackRef = useRef<HTMLDivElement | null>(null);
 
   const [maturityFilter, setMaturityFilter] = useState<'all' | SkillMaturity>('all');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | string>('all');
-
   const totalSkills = SKILL_CATEGORIES.reduce((acc, cat) => acc + cat.items.length, 0);
-
-  // Flattened deduplicated skills list with logos for full scroll bar
-  const allSkills = useMemo(() => {
-    const list: FlatSkill[] = [];
-    const seen = new Set<string>();
-    SKILL_CATEGORIES.forEach((cat) => {
-      cat.items.forEach((item) => {
-        if (!seen.has(item.name)) {
-          seen.add(item.name);
-          list.push({
-            name: item.name,
-            categoryId: cat.id,
-            categoryTitle: cat.title,
-            maturity: item.maturity,
-            evidence: item.evidence,
-            projectSlug: item.projectSlug
-          });
-        }
-      });
-    });
-    return list;
-  }, []);
-
-  const filteredSkills = useMemo(() => {
-    return allSkills.filter((s) => {
-      const matchCat = selectedCategory === 'all' || s.categoryId === selectedCategory;
-      const matchMat = maturityFilter === 'all' || s.maturity === maturityFilter;
-      return matchCat && matchMat;
-    });
-  }, [allSkills, selectedCategory, maturityFilter]);
-
-  const handleScrollBy = (offset: number) => {
-    if (!scrollTrackRef.current) return;
-    scrollTrackRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-  };
 
   // Entrance animations on scroll into Technical Index
   useGSAP(
@@ -81,7 +65,7 @@ export function SkillsSection() {
         }
       });
 
-      // Category rows entrance with stagger
+      // Category rows entrance with stagger (Desktop)
       gsap.from('.skill-category-row', {
         y: 32,
         autoAlpha: 0,
@@ -170,130 +154,68 @@ export function SkillsSection() {
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-[var(--muted)]">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[var(--status-live-fg)]" aria-hidden="true" />
-              <span>Applied in projects</span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full border border-dashed border-[var(--accent)]" aria-hidden="true" />
-              <span>Currently exploring</span>
-            </span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1.5 text-[11px]">
-            <span>Showing {filteredSkills.length} skills with logos</span>
-          </div>
+        {/* Legend (Desktop) */}
+        <div className="mt-5 hidden sm:flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs text-[var(--muted)]">
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[var(--status-live-fg)]" aria-hidden="true" />
+            <span>Applied in projects</span>
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full border border-dashed border-[var(--accent)]" aria-hidden="true" />
+            <span>Currently exploring</span>
+          </span>
         </div>
 
-        {/* Full Scroll Bar of Skills with Logos */}
-        <div className="mt-6 rounded-xl border border-[var(--line-strong)] bg-[var(--surface)] p-4 sm:p-5 shadow-sm">
-          {/* Header Controls for the Full Scroll Bar: Category Tabs & Left/Right buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[var(--line)] pb-3.5">
-            {/* Category Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none [mask-image:linear-gradient(to_right,black_88%,transparent)]">
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('all')}
-                className={`btn-tactile shrink-0 rounded-full px-3 py-1 font-mono text-[11px] font-medium transition-all ${
-                  selectedCategory === 'all'
-                    ? 'border border-[var(--accent)] bg-[var(--accent-tint)] text-[var(--accent)]'
-                    : 'border border-[var(--line)] bg-[var(--surface-subtle)] text-[var(--muted)] hover:border-[var(--line-strong)]'
-                }`}
-              >
-                All Skills ({allSkills.length})
-              </button>
-              {SKILL_CATEGORIES.map((cat) => {
-                const isSelected = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`btn-tactile shrink-0 rounded-full px-3 py-1 font-mono text-[11px] font-medium transition-all ${
-                      isSelected
-                        ? 'border border-[var(--accent)] bg-[var(--accent-tint)] text-[var(--accent)]'
-                        : 'border border-[var(--line)] bg-[var(--surface-subtle)] text-[var(--muted)] hover:border-[var(--line-strong)]'
-                    }`}
-                  >
-                    <span>{cat.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Manual Scroll Arrow Controls (Tactile Buttons) */}
-            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => handleScrollBy(-280)}
-                aria-label="Scroll skills left"
-                className="btn-tactile rounded-md border border-[var(--line)] bg-[var(--surface-subtle)] p-1.5 text-[var(--fg-2)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--fg)]"
-              >
-                <CaretLeft size={14} weight="bold" />
-              </button>
-              <button
-                type="button"
-                onClick={() => handleScrollBy(280)}
-                aria-label="Scroll skills right"
-                className="btn-tactile rounded-md border border-[var(--line)] bg-[var(--surface-subtle)] p-1.5 text-[var(--fg-2)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--fg)]"
-              >
-                <CaretRight size={14} weight="bold" />
-              </button>
-            </div>
+        {/* ------------------------------------------------------------- */}
+        {/* MOBILE ONLY: Automatic Continuous Marquee Ticker (Image 2 style) */}
+        {/* ------------------------------------------------------------- */}
+        <div className="sm:hidden mt-8">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--accent)]">
+              Tech Stack &amp; Tooling
+            </span>
+            <span className="font-mono text-[10px] text-[var(--muted)]">
+              Auto-scrolling stream
+            </span>
           </div>
 
-          {/* Dedicated Horizontal Scroll Track of Skills with Logos */}
-          <div
-            ref={scrollTrackRef}
-            className="skills-scroll-track mt-4 overflow-x-auto pb-3 pt-1 scroll-smooth"
-          >
-            <div className="grid grid-rows-2 sm:grid-rows-3 grid-flow-col auto-cols-max gap-2.5 min-w-max pr-6">
-              {filteredSkills.map((skill) => (
+          <div className="marquee-container overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] py-4 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            {/* Track 1: Gliding Left */}
+            <div className="animate-marquee-left flex gap-3">
+              {[...MARQUEE_TRACK_1, ...MARQUEE_TRACK_1].map((skill, i) => (
                 <div
-                  key={skill.name}
-                  className="flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3 py-2 transition-all hover:border-[var(--accent)] hover:shadow-sm"
+                  key={`t1-${skill.name}-${i}`}
+                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-xs shrink-0"
                 >
-                  <TechLogo name={skill.name} className="h-5 w-5 shrink-0" />
-                  <span className="font-mono text-xs font-semibold text-[var(--fg)] whitespace-nowrap">
-                    {skill.name}
+                  <TechLogo name={skill.name} className="h-4 w-4 shrink-0" />
+                  <span className="font-mono text-xs font-medium text-[var(--fg)] whitespace-nowrap">
+                    {skill.label}
                   </span>
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full shrink-0 ${
-                      skill.maturity === 'applied'
-                        ? 'bg-[var(--status-live-fg)]'
-                        : 'border border-[var(--accent)]'
-                    }`}
-                    title={skill.maturity === 'applied' ? 'Applied in projects' : 'Currently exploring'}
-                    aria-hidden="true"
-                  />
-                  {skill.projectSlug && (
-                    <Link
-                      to={`/projects/${skill.projectSlug}`}
-                      aria-label={`View ${skill.name} project proof`}
-                      className="inline-flex items-center text-[var(--accent)] opacity-60 hover:opacity-100 transition-opacity ml-0.5"
-                    >
-                      <ArrowUpRight size={11} />
-                    </Link>
-                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Track 2: Gliding Right (Opposite Direction) */}
+            <div className="animate-marquee-right mt-3 flex gap-3">
+              {[...MARQUEE_TRACK_2, ...MARQUEE_TRACK_2].map((skill, i) => (
+                <div
+                  key={`t2-${skill.name}-${i}`}
+                  className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-elevated,var(--surface))] px-3.5 py-1.5 shadow-xs shrink-0"
+                >
+                  <TechLogo name={skill.name} className="h-4 w-4 shrink-0" />
+                  <span className="font-mono text-xs font-medium text-[var(--fg)] whitespace-nowrap">
+                    {skill.label}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Swipe / Scroll Hint */}
-          <div className="mt-2.5 flex items-center justify-between text-[11px] font-mono text-[var(--muted)]">
-            <span>← Scroll horizontally to view all skills →</span>
-            <span className="sm:hidden flex items-center gap-1 text-[10px]">
-              <span>Swipe left / right</span>
-            </span>
-          </div>
         </div>
 
-        {/* 7-category typographic ledger (Desktop & Tablet) */}
-        <div ref={rowsContainerRef} className="mt-10 hidden sm:block divide-y divide-[var(--line)] border-y border-[var(--line)]">
+        {/* ------------------------------------------------------------- */}
+        {/* DESKTOP & TABLET: Clean 7-Category Typographic Ledger */}
+        {/* ------------------------------------------------------------- */}
+        <div ref={rowsContainerRef} className="mt-8 hidden sm:block divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {SKILL_CATEGORIES.map((category) => {
             const visibleItems =
               maturityFilter === 'all'
