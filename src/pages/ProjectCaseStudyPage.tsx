@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, CaretDown } from '@phosphor-icons/react';
 import { PROJECTS, PROJECT_BY_SLUG, type ProjectRecord } from '../content/projects';
 import { useMeta } from '../hooks/useMeta';
 import { useScrollReveals } from '../lib/motion';
@@ -8,6 +8,107 @@ import { scrollToTopImmediate, ScrollTrigger } from '../lib/smooth';
 import { InteractiveProjectLab } from '../components/InteractiveProjectLab';
 import { FieldBackground } from '../components/FieldBackground';
 import { NotFoundPage } from './NotFoundPage';
+
+function TruncatedList<T>({
+  items,
+  renderItem,
+  maxMobile = 3,
+  className = ''
+}: {
+  items: T[];
+  renderItem: (item: T, index: number) => React.ReactNode;
+  maxMobile?: number;
+  className?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  if (items.length <= maxMobile) {
+    return <ul className={className}>{items.map(renderItem)}</ul>;
+  }
+
+  return (
+    <div>
+      <ul className={className}>
+        {items.map((item, index) => {
+          const isHiddenOnMobile = !expanded && index >= maxMobile;
+          return (
+            <div
+              key={index}
+              className={isHiddenOnMobile ? 'hidden sm:block' : 'block'}
+            >
+              {renderItem(item, index)}
+            </div>
+          );
+        })}
+      </ul>
+
+      <div className="mt-2 sm:hidden">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 py-1 font-medium"
+        >
+          <span>{expanded ? '▲ Show top 3 only' : `▼ +${items.length - maxMobile} more points`}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CollapsibleSection({
+  title,
+  eyebrow,
+  badge,
+  children,
+  defaultOpenMobile = false
+}: {
+  title: string;
+  eyebrow?: string;
+  badge?: string;
+  children: React.ReactNode;
+  defaultOpenMobile?: boolean;
+}) {
+  const [isOpenMobile, setIsOpenMobile] = useState(defaultOpenMobile);
+
+  return (
+    <section className="space-y-4" data-reveal>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)]/60 pb-3 lg:border-b-0 lg:pb-0">
+        <div>
+          {eyebrow && (
+            <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">
+              {eyebrow}
+            </p>
+          )}
+          <h2 className="mt-1 text-xl sm:text-2xl font-semibold text-[var(--fg)] flex items-center gap-2">
+            <span>{title}</span>
+            {badge && (
+              <span className="font-mono text-[10px] font-normal uppercase tracking-wider px-2 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--muted)]">
+                {badge}
+              </span>
+            )}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsOpenMobile(!isOpenMobile)}
+          className="lg:hidden inline-flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1 font-mono text-xs text-[var(--fg)] hover:border-[var(--accent)] transition-colors"
+          aria-expanded={isOpenMobile}
+        >
+          <span>{isOpenMobile ? 'Collapse' : 'Expand Deep Dive'}</span>
+          <CaretDown
+            size={12}
+            className={`transition-transform duration-200 ${isOpenMobile ? 'rotate-180' : ''}`}
+          />
+        </button>
+      </div>
+
+      <div className={`${isOpenMobile ? 'block' : 'hidden lg:block'}`}>
+        {children}
+      </div>
+    </section>
+  );
+}
 
 export function ProjectCaseStudyPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -269,33 +370,41 @@ export function ProjectCaseStudyPage() {
             <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
               <h2 className="text-lg font-semibold text-[var(--fg)]">What I Built &amp; My Contribution</h2>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-2)]">{project.contribution}</p>
-              <ul className="mt-4 space-y-2.5 border-t border-[var(--line)] pt-4">
-                {project.whatIBuilt.map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--fg-2)]">
-                    <span
-                      className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
-                      aria-hidden="true"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-4 border-t border-[var(--line)] pt-4">
+                <TruncatedList
+                  items={project.whatIBuilt}
+                  maxMobile={3}
+                  className="space-y-2.5"
+                  renderItem={(item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--fg-2)]">
+                      <span
+                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]"
+                        aria-hidden="true"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  )}
+                />
+              </div>
             </div>
           </div>
         </section>
 
         {/* Architecture Workflow */}
-        <section aria-labelledby="arch-heading" data-reveal>
-          <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">System Workflow</p>
-          <h2 id="arch-heading" className="mt-2 text-2xl font-semibold text-[var(--fg)]">
-            Architecture Pipeline
-          </h2>
-
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <CollapsibleSection
+          eyebrow="System Workflow"
+          title="Architecture Pipeline"
+          badge={`${project.architecture.length} Stages`}
+          defaultOpenMobile={false}
+        >
+          <div className="sm:hidden font-mono text-[11px] text-[var(--muted)] flex items-center gap-1.5 mb-2">
+            <span>↔ Swipe stages horizontally</span>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible sm:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
             {project.architecture.map((stage) => (
               <div
                 key={stage.step}
-                className="flex flex-col justify-between rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5"
+                className="min-w-[270px] max-w-[300px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none flex flex-col justify-between rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5"
               >
                 <div>
                   <span className="font-mono text-xs font-semibold text-[var(--accent)]">Stage {stage.step}</span>
@@ -308,106 +417,156 @@ export function ProjectCaseStudyPage() {
               </div>
             ))}
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* Interactive Walkthrough */}
-        <InteractiveProjectLab slug={project.slug} />
+        <CollapsibleSection
+          eyebrow="Interactive Sandbox"
+          title="Live Code Scanner Lab"
+          badge="Interactive"
+          defaultOpenMobile={false}
+        >
+          <InteractiveProjectLab slug={project.slug} />
+        </CollapsibleSection>
 
         {/* Honest Implementation Status Matrix */}
-        <section aria-labelledby="status-heading" data-reveal>
-          <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">Honest Capability Audit</p>
-          <h2 id="status-heading" className="mt-2 text-2xl font-semibold text-[var(--fg)]">
-            Implemented vs. Partial vs. Planned Roadmap
-          </h2>
-          <p className="mt-1.5 text-sm text-[var(--fg-2)]">
+        <CollapsibleSection
+          eyebrow="Honest Capability Audit"
+          title="Implemented vs. Partial vs. Planned Roadmap"
+          badge="Audit Matrix"
+          defaultOpenMobile={false}
+        >
+          <p className="text-sm text-[var(--fg-2)]">
             Explicit verification against repository source files so planned ideas are never presented as shipped work.
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
-            <div className="rounded-xl border border-[var(--status-live-border)] bg-[var(--surface)] p-5">
-              <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--status-live-fg)]">
-                Implemented in Repo
-              </h3>
-              <ul className="mt-3 space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]">
-                {project.featureStatus.implemented.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--status-live-fg)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+          <div className="sm:hidden font-mono text-[11px] text-[var(--muted)] flex items-center gap-1.5 mt-2 mb-1">
+            <span>↔ Swipe categories horizontally</span>
+          </div>
+
+          <div className="mt-4 flex gap-5 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="min-w-[280px] max-w-[320px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none rounded-xl border border-[var(--status-live-border)] bg-[var(--surface)] p-5 flex flex-col justify-between">
+              <div>
+                <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--status-live-fg)]">
+                  Implemented in Repo
+                </h3>
+                <div className="mt-3">
+                  <TruncatedList
+                    items={project.featureStatus.implemented}
+                    maxMobile={3}
+                    className="space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]"
+                    renderItem={(item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--status-live-fg)]" />
+                        <span>{item}</span>
+                      </li>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--status-warn-border)] bg-[var(--surface)] p-5">
-              <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--status-warn-fg)]">
-                Partial / Fallback Behavior
-              </h3>
-              <ul className="mt-3 space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]">
-                {project.featureStatus.partialOrFallback.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--status-warn-fg)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="min-w-[280px] max-w-[320px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none rounded-xl border border-[var(--status-warn-border)] bg-[var(--surface)] p-5 flex flex-col justify-between">
+              <div>
+                <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--status-warn-fg)]">
+                  Partial / Fallback Behavior
+                </h3>
+                <div className="mt-3">
+                  <TruncatedList
+                    items={project.featureStatus.partialOrFallback}
+                    maxMobile={3}
+                    className="space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]"
+                    renderItem={(item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--status-warn-fg)]" />
+                        <span>{item}</span>
+                      </li>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5">
-              <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                Planned / Future Roadmap
-              </h3>
-              <ul className="mt-3 space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]">
-                {project.featureStatus.plannedRoadmap.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--muted)]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="min-w-[280px] max-w-[320px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 flex flex-col justify-between">
+              <div>
+                <h3 className="font-mono text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+                  Planned / Future Roadmap
+                </h3>
+                <div className="mt-3">
+                  <TruncatedList
+                    items={project.featureStatus.plannedRoadmap}
+                    maxMobile={3}
+                    className="space-y-2.5 text-xs leading-relaxed text-[var(--fg-2)]"
+                    renderItem={(item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--muted)]" />
+                        <span>{item}</span>
+                      </li>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* Engineering Decisions & Challenges */}
-        <section className="grid grid-cols-1 gap-6 lg:grid-cols-2" data-reveal>
-          <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-            <h2 className="text-lg font-semibold text-[var(--fg)]">Key Engineering Decisions</h2>
-            <ul className="mt-4 space-y-3">
-              {project.engineeringDecisions.map((dec) => (
-                <li key={dec} className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--fg-2)]">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden="true" />
-                  <span>{dec}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <CollapsibleSection
+          eyebrow="Architecture Tradeoffs"
+          title="Key Engineering Decisions & Challenges"
+          badge="Tradeoffs"
+          defaultOpenMobile={false}
+        >
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
+              <h3 className="text-base font-semibold text-[var(--fg)]">Key Engineering Decisions</h3>
+              <div className="mt-4">
+                <TruncatedList
+                  items={project.engineeringDecisions}
+                  maxMobile={3}
+                  className="space-y-3"
+                  renderItem={(dec) => (
+                    <li key={dec} className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--fg-2)]">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+                      <span>{dec}</span>
+                    </li>
+                  )}
+                />
+              </div>
+            </div>
 
-          <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
-            <h2 className="text-lg font-semibold text-[var(--fg)]">Challenges &amp; Solutions</h2>
-            <div className="mt-4 space-y-4">
-              {project.challenges.map((c) => (
-                <div key={c.challenge} className="rounded-lg border border-[var(--line)] bg-[var(--bg)] p-4 text-sm">
-                  <p className="font-medium text-[var(--fg)]">Challenge: {c.challenge}</p>
-                  <p className="mt-1.5 text-[var(--fg-2)]">Solution: {c.solution}</p>
-                </div>
-              ))}
+            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
+              <h3 className="text-base font-semibold text-[var(--fg)]">Challenges &amp; Solutions</h3>
+              <div className="mt-4">
+                <TruncatedList
+                  items={project.challenges}
+                  maxMobile={2}
+                  className="space-y-4"
+                  renderItem={(c) => (
+                    <div key={c.challenge} className="rounded-lg border border-[var(--line)] bg-[var(--bg)] p-4 text-sm">
+                      <p className="font-medium text-[var(--fg)]">Challenge: {c.challenge}</p>
+                      <p className="mt-1.5 text-[var(--fg-2)]">Solution: {c.solution}</p>
+                    </div>
+                  )}
+                />
+              </div>
             </div>
           </div>
-        </section>
+        </CollapsibleSection>
 
         {/* Future Improvements */}
         <section className="rounded-xl border border-[var(--line)] bg-[var(--surface-subtle)]/50 p-6" data-reveal>
           <h2 className="text-base font-semibold text-[var(--fg)]">Next Engineering Priorities</h2>
-          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-3 pt-1 snap-x snap-mandatory sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 scrollbar-none -mx-2 px-2 sm:mx-0 sm:px-0">
             {project.futureImprovements.map((nextItem) => (
-              <li
+              <div
                 key={nextItem}
-                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3.5 text-xs leading-relaxed text-[var(--fg-2)]"
+                className="min-w-[260px] max-w-[300px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3.5 text-xs leading-relaxed text-[var(--fg-2)]"
               >
                 {nextItem}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
 
         {/* Next Flagship Editorial Handoff (PRABHUSIDDARTH Parity) */}
