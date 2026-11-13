@@ -5,6 +5,8 @@ export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement | null>(null);
   const [cursorText, setCursorText] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isInput, setIsInput] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || isReducedMotion() || isCoarsePointer()) {
@@ -28,6 +30,16 @@ export function CustomCursor() {
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
+      const isInputField = Boolean(
+        target.closest('input, textarea, select, .monaco-editor, [contenteditable="true"]')
+      );
+      setIsInput(isInputField);
+
+      const interactive = Boolean(
+        target.closest('a, button, [role="button"], summary, [data-cursor], .pill, .chip, .row, .li-card')
+      );
+      setIsHovered(interactive);
+
       const cursorTarget = target.closest<HTMLElement>('[data-cursor]');
       if (cursorTarget && cursorTarget.dataset.cursor) {
         setCursorText(cursorTarget.dataset.cursor);
@@ -45,7 +57,7 @@ export function CustomCursor() {
     };
 
     const animate = () => {
-      const ease = 0.22;
+      const ease = 0.28;
       currentX += (mouseX - currentX) * ease;
       currentY += (mouseY - currentY) * ease;
 
@@ -77,20 +89,25 @@ export function CustomCursor() {
       ref={cursorRef}
       data-html2canvas-ignore=""
       aria-hidden="true"
-      className={`custom-cursor pointer-events-none fixed left-0 top-0 z-[9990] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+      className={`custom-cursor pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-200 ${
+        isVisible && !isInput ? 'opacity-100' : 'opacity-0'
       }`}
-      style={{ willChange: 'transform' }}
+      style={{
+        willChange: 'transform',
+        mixBlendMode: 'difference'
+      }}
     >
       <div
-        className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
+        className={`flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out ${
           isBadge
-            ? 'h-[88px] w-[88px] bg-[var(--accent)] shadow-2xl scale-100'
-            : 'h-2.5 w-2.5 bg-[var(--accent)] scale-100'
+            ? 'h-20 w-20 shadow-2xl scale-100'
+            : isHovered
+              ? 'h-8 w-8 scale-100'
+              : 'h-3.5 w-3.5 scale-100'
         }`}
       >
         {isBadge && (
-          <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0b0b0a] select-none text-center px-1">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-black select-none text-center px-2">
             {cursorText}
           </span>
         )}

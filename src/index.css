@@ -1293,6 +1293,26 @@ html.theme-fade *::after {
   user-select: none;
 }
 
+/* Custom Cursor: Hide default OS cursor arrow on mouse devices so the dot is the sole cursor */
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body,
+  a,
+  button,
+  [role="button"],
+  summary {
+    cursor: none !important;
+  }
+
+  input,
+  textarea,
+  select,
+  .monaco-editor,
+  .monaco-editor * {
+    cursor: text !important;
+  }
+}
+
 @media (pointer: coarse) {
   .custom-cursor {
     display: none !important;
