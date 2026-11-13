@@ -76,6 +76,7 @@ export function ProjectsSection() {
 
   return (
     <section id="projects" aria-labelledby="projects-heading" className="border-b border-[var(--line)]">
+      <span id="work" className="sr-only" />
       {/* =========================================================================
           Flagship Showcase: Horizontal Pinned Experience on Desktop
           ========================================================================= */}
@@ -242,8 +243,9 @@ export function ProjectsSection() {
 
       {/* =========================================================================
           Works Index: Rapid Editorial Filterable Project Directory (Image 4 Parity)
+          Hidden on mobile per user request to keep mobile project browsing clean
           ========================================================================= */}
-      <div id="work" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 border-t border-[var(--line)] overflow-x-clip">
+      <div className="hidden sm:block mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 border-t border-[var(--line)] overflow-x-clip">
         <div className="flex flex-col justify-between gap-6 pb-6 md:flex-row md:items-end">
           <div>
             <span className="mono muted">
