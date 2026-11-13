@@ -176,12 +176,12 @@ export function SkillsSection() {
             return (
               <div
                 key={category.id}
-                className="skill-category-row grid grid-cols-1 gap-5 py-7 lg:grid-cols-12 lg:gap-10"
+                className="skill-category-row grid grid-cols-1 gap-4 py-5 sm:gap-5 sm:py-7 lg:grid-cols-12 lg:gap-10"
               >
                 <div className="lg:col-span-4">
                   <span className="font-mono text-xs text-[var(--muted)]">{category.index}</span>
-                  <h3 className="mt-1 text-lg font-semibold text-[var(--fg)]">{category.title}</h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">{category.summary}</p>
+                  <h3 className="mt-1 text-base sm:text-lg font-semibold text-[var(--fg)]">{category.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{category.summary}</p>
                 </div>
 
                 <div className="lg:col-span-8">
@@ -208,7 +208,8 @@ export function SkillsSection() {
                     ))}
                   </div>
 
-                  <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 border-t border-[var(--line)]/70 pt-3 sm:grid-cols-2">
+                  {/* Dense evidence ledger hidden on mobile to keep category view clean & focused on tech stack */}
+                  <dl className="mt-4 hidden sm:grid grid-cols-1 gap-x-6 gap-y-2 border-t border-[var(--line)]/70 pt-3 sm:grid-cols-2">
                     {visibleItems.map((item) => (
                       <div key={item.name} className="flex items-baseline justify-between gap-2 text-xs">
                         <div className="min-w-0">

@@ -177,8 +177,8 @@ export function ProjectCaseStudyPage() {
               {project.summary}
             </p>
 
-            {/* Single-line action buttons */}
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-5">
+            {/* Action buttons (responsive grid on mobile, flex on desktop) */}
+            <div className="p-hero-actions mt-5">
               <a
                 href={project.repoUrl}
                 target="_blank"
@@ -199,7 +199,10 @@ export function ProjectCaseStudyPage() {
                 </a>
               )}
 
-              <Link to="/#work" className="pill text-xs sm:text-sm">
+              <Link
+                to="/#work"
+                className={`pill text-xs sm:text-sm ${project.liveUrl ? 'p-hero-action-full' : ''}`}
+              >
                 All my work <span className="arrow">&#8599;</span>
               </Link>
             </div>
@@ -230,17 +233,24 @@ export function ProjectCaseStudyPage() {
       </section>
 
       {/* Role & Tech Stack Monospace Strip */}
-      <div className="border-b border-[var(--line)] bg-[var(--surface-subtle)]/40 py-5">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 font-mono text-xs text-[var(--muted)]">
-            <span className="uppercase text-[var(--accent)] font-semibold">Role</span>
-            <span aria-hidden="true">/</span>
-            <span>{project.contribution.split('.')[0]}</span>
+      <div className="border-b border-[var(--line)] bg-[var(--surface-subtle)]/40 py-3 sm:py-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--muted)]">
+            <span className="uppercase text-[var(--accent)] font-semibold tracking-wider">Role</span>
+            <span aria-hidden="true" className="text-[var(--line-strong)]">/</span>
+            <span className="font-semibold text-[var(--fg)]">{project.role}</span>
+            <span className="hidden md:inline text-[var(--muted)]">— {project.contribution}</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--fg-2)]">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 sm:flex-wrap sm:pb-0 font-mono text-xs text-[var(--fg-2)]">
+            <span className="shrink-0 text-[10px] uppercase tracking-wider text-[var(--muted)] font-semibold sm:hidden">
+              Stack:
+            </span>
             {project.stack.map((s) => (
-              <span key={s} className="rounded border border-[var(--line)] bg-[var(--surface)] px-2.5 py-0.5">
+              <span
+                key={s}
+                className="shrink-0 rounded border border-[var(--line)] bg-[var(--surface)] px-2 py-0.5 text-[11px] sm:px-2.5 sm:text-xs"
+              >
                 {s}
               </span>
             ))}

@@ -39,6 +39,7 @@ export interface ProjectRecord {
   problem: string;
   motivation: string;
   whatIBuilt: string[];
+  role: string;
   contribution: string;
   stack: string[];
   repoUrl: string;
@@ -87,6 +88,7 @@ export const PROJECTS: ProjectRecord[] = [
       'Gemini REST bridge (src/utils/ai.js) cycling sequentially across 4 model endpoints with a 60-second UI cooldown and a local deterministic simulation layer (src/utils/simulation.js).',
       'Firebase Authentication (Email/Password, Google, GitHub) paired with optimistic localStorage caching and UID-isolated Firestore rules (firestore.rules).'
     ],
+    role: 'Sole Creator & Full-Stack Builder',
     contribution:
       'Sole creator and full-stack builder responsible for the React component architecture, heuristic rulebook, Monaco z-index layering fixes, Firebase Auth/Firestore rules, and Gemini fallback logic.',
     stack: [
@@ -209,6 +211,7 @@ export const PROJECTS: ProjectRecord[] = [
       'RelationshipEngine and ContributionEngine extracting deterministic closing/superseding links, historical precedents, log-dampened contributor impact scores, and bus-factor concentration risks.',
       'RepositoryMapEngine generating folder trees, churn hotspot heatmaps, temporal co-change matrices, blast-radius predictors, and multi-format exports (Markdown, Mermaid, ASCII, HTML dossier).'
     ],
+    role: 'Lead Architect & Systems Engineer',
     contribution:
       'Architected and implemented the monorepo workspaces, Prisma PostgreSQL schema, Fastify API routes, intelligence engines, React workbench pages, and 25 Vitest test suites.',
     stack: [
@@ -339,6 +342,7 @@ export const PROJECTS: ProjectRecord[] = [
       'Payload inspector (src/sni_extractor.py) implementing TLS ClientHello validation (0x16 handshake, 0x01 ClientHello), variable-length field skipping, and SNI extension (0x0000) extraction alongside HTTP Host parsing and a standalone DNS query parser.',
       'Single-threaded (dpi_simple.py) and multi-processed (dpi_mt.py) CLI runners plus synthetic PCAP generator (generate_test_pcap.py) outputting filtered PCAPs and traffic reports.'
     ],
+    role: 'Systems Engineer & Tool Author',
     contribution:
       'Implemented the complete Python port (adapted from a C++ packet-inspector design), CLI argument parser, multi-process worker queues, synthetic test generator, and architecture documentation.',
     stack: [
@@ -473,6 +477,7 @@ Opened PCAP file: test_dpi.pcap
       'DependencyScanner parsing package.json dependencies & devDependencies and querying api.osv.dev/v1/query for npm vulnerabilities.',
       'ConfigScanner flagging .git/config exposure, Dockerfile root users or hardcoded ENV secrets, debug=true flags, S3 URLs, and wildcard CORS headers, paired with RiskCalculator and React 19 + Recharts dashboard.'
     ],
+    role: 'Full-Stack Security Builder',
     contribution:
       'Built the full TypeScript backend, scanner modules, OSV.dev integration, React frontend dashboard, JSON export, and Dockerfiles for containerized local deployment.',
     stack: [
