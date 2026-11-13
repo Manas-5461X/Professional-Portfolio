@@ -152,31 +152,32 @@ export function ProjectsSection() {
                     {project.tagline}
                   </p>
 
-                  {/* Verified highlights metrics */}
-                  <div className="metrics mt-5 border-y border-[var(--line)] py-3">
-                    {project.verifiedHighlights.map((m) => (
-                      <div key={m.label} className="flex flex-col">
-                        <b className="text-[var(--fg)]">{m.value}</b>
-                        <span className="font-mono text-[11px] text-[var(--muted)]">{m.label}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Verified highlights metrics & Tech stack (hidden on mobile for clean card layout) */}
+                  <div className="hidden sm:block">
+                    <div className="metrics mt-5 border-y border-[var(--line)] py-3">
+                      {project.verifiedHighlights.map((m) => (
+                        <div key={m.label} className="flex flex-col">
+                          <b className="text-[var(--fg)]">{m.value}</b>
+                          <span className="font-mono text-[11px] text-[var(--muted)]">{m.label}</span>
+                        </div>
+                      ))}
+                    </div>
 
-                  {/* Tech stack pills */}
-                  <ul aria-label={`${project.name} technologies`} className="mt-4 flex flex-wrap gap-1.5">
-                    {project.stack.slice(0, 5).map((tech) => (
-                      <li
-                        key={tech}
-                        className="rounded border border-[var(--line)] bg-[var(--surface-subtle)] px-2.5 py-0.5 font-mono text-[11px] text-[var(--fg-2)]"
-                      >
-                        {tech}
-                      </li>
-                    ))}
-                  </ul>
+                    <ul aria-label={`${project.name} technologies`} className="mt-4 flex flex-wrap gap-1.5">
+                      {project.stack.slice(0, 5).map((tech) => (
+                        <li
+                          key={tech}
+                          className="rounded border border-[var(--line)] bg-[var(--surface-subtle)] px-2.5 py-0.5 font-mono text-[11px] text-[var(--fg-2)]"
+                        >
+                          {tech}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
 
                 {/* Bottom CTA Actions */}
-                <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-[var(--line)]">
+                <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-[var(--line)]">
                   <Link
                     to={`/projects/${project.slug}`}
                     className="pill solid text-xs"

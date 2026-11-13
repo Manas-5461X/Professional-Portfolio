@@ -267,23 +267,35 @@ export function TimelineAndActivitySection() {
           </div>
 
           <div className="lg:col-span-8">
-            <ol ref={timelineListRef} className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
-              {TIMELINE.map((entry) => (
+            {/* Mobile swipe helper */}
+            <div className="mb-3 flex items-center justify-between sm:hidden font-mono text-[11px] text-[var(--muted)]">
+              <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">Milestones</span>
+              <span>← Swipe timeline (6) →</span>
+            </div>
+
+            <ol
+              ref={timelineListRef}
+              className="flex gap-3 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:block sm:divide-y sm:divide-[var(--line)] sm:border-y sm:border-[var(--line)] sm:overflow-visible sm:pb-0 sm:pt-0"
+            >
+              {TIMELINE.map((entry, idx) => (
                 <li
                   key={`${entry.period}-${entry.title}`}
-                  className="timeline-entry grid grid-cols-1 gap-2 py-5 sm:grid-cols-12 sm:gap-6"
+                  className="timeline-entry min-w-[275px] max-w-[295px] shrink-0 snap-start rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:min-w-0 sm:max-w-none sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:py-5 grid grid-cols-1 gap-2 sm:grid-cols-12 sm:gap-6"
                 >
                   <div className="sm:col-span-4">
-                    <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
+                    <div className="flex items-center justify-between sm:block">
+                      <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
+                      <span className="font-mono text-[10px] text-[var(--muted)] sm:hidden">0{idx + 1} / 06</span>
+                    </div>
                     <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">
                       {entry.category}
                     </p>
                   </div>
                   <div className="sm:col-span-8">
-                    <h3 className="text-base font-semibold text-[var(--fg)]">{entry.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-[var(--fg-2)]">{entry.summary}</p>
+                    <h3 className="text-sm sm:text-base font-semibold text-[var(--fg)]">{entry.title}</h3>
+                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--fg-2)]">{entry.summary}</p>
                     {entry.evidence && (
-                      <p className="mt-2 font-mono text-xs text-[var(--muted)]">Artifact: {entry.evidence}</p>
+                      <p className="mt-2 font-mono text-[11px] sm:text-xs text-[var(--muted)]">Artifact: {entry.evidence}</p>
                     )}
                   </div>
                 </li>
@@ -391,8 +403,8 @@ export function TimelineAndActivitySection() {
           </p>
         </div>
 
-        {/* Part 3: Verified Facts Ledger */}
-        <div ref={milestonesRef} className="mt-14 border-t border-[var(--line)] pt-10">
+        {/* Part 3: Verified Facts Ledger (hidden on mobile per user request) */}
+        <div ref={milestonesRef} className="hidden sm:block mt-14 border-t border-[var(--line)] pt-10">
           <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-xs uppercase tracking-wider text-[var(--accent)]">Verified Highlights</p>
@@ -424,10 +436,6 @@ export function TimelineAndActivitySection() {
               </article>
             ))}
           </div>
-
-          <p className="mt-6 border-t border-[var(--line)] pt-4 font-mono text-xs leading-relaxed text-[var(--muted)]">
-            Note: {PROFILE.verificationNote}
-          </p>
         </div>
       </div>
     </section>

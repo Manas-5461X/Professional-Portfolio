@@ -8,7 +8,7 @@ export function InterestsSection() {
   const activeTrack = AREAS_OF_INTEREST.find((t) => t.id === activeId) || AREAS_OF_INTEREST[0];
 
   return (
-    <section id="interests" aria-labelledby="interests-heading" className="border-b border-[var(--line)] py-16 sm:py-24">
+    <section id="interests" aria-labelledby="interests-heading" className="hidden sm:block border-b border-[var(--line)] py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-4 border-b border-[var(--line)] pb-8 sm:flex-row sm:items-end">
           <div>
