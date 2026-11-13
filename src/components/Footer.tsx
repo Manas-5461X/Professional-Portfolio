@@ -260,18 +260,18 @@ export function Footer() {
                 className="hp"
               />
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pt-2">
                 <button
                   type="submit"
                   disabled={status === 'submitting'}
-                  className="pill solid light"
+                  className="pill solid light w-full sm:w-auto justify-center"
                 >
                   <span className="dot" />
                   <span>{status === 'submitting' ? 'Sending...' : 'Send Message'}</span>
                 </button>
 
                 <span
-                  className="mono muted"
+                  className="mono muted text-xs sm:text-sm"
                   role="status"
                   aria-live="polite"
                   style={{ color: status === 'error' ? '#FF8A6B' : undefined }}
@@ -306,12 +306,12 @@ export function Footer() {
             data-cursor="Connect"
           >
             <span className="mono muted">LinkedIn</span>
-            <span className="serif text-2xl sm:text-3xl text-[var(--paper)] leading-tight">
+            <span className="serif text-xl sm:text-2xl md:text-3xl text-[var(--paper)] leading-tight">
               Connect with me on LinkedIn
             </span>
             <span className="mono flex items-center gap-1.5 text-xs text-[var(--paper)] opacity-85">
-              <span>{PROFILE.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com/, '')}</span>
-              <span className="arrow">&#8599;</span>
+              <span className="truncate">{PROFILE.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com/, '')}</span>
+              <span className="arrow flex-shrink-0">&#8599;</span>
             </span>
           </a>
 
@@ -326,7 +326,7 @@ export function Footer() {
 
           <a
             href={`mailto:${PROFILE.email}`}
-            className="pill light"
+            className="pill light w-full sm:w-auto justify-center"
           >
             {PROFILE.email}
           </a>

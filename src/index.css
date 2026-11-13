@@ -958,10 +958,18 @@ button:hover .arrow {
   align-items: start;
 }
 
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+}
+
 .contact-side {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  min-width: 0;
 }
 
 .li-card {
@@ -974,6 +982,8 @@ button:hover .arrow {
   transition: border-color 0.3s, background-color 0.3s;
   color: inherit;
   text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .li-card:hover {
@@ -985,6 +995,8 @@ button:hover .arrow {
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .cform-row {
@@ -997,10 +1009,14 @@ button:hover .arrow {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .cform input,
 .cform textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: transparent;
   border: 0;
   border-bottom: 1px solid rgba(238, 234, 226, 0.25);
@@ -1025,6 +1041,44 @@ button:hover .arrow {
   width: 1px;
   height: 1px;
   opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .contact {
+    padding: 3.5rem var(--gutter, 1.25rem) 2rem;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .contact-mail {
+    font-size: clamp(2.2rem, 11vw, 3.8rem);
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .cform {
+    gap: 1.5rem;
+  }
+
+  .cform-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .li-card {
+    padding: 1.4rem;
+  }
+
+  .foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    margin-top: 3.5rem;
+  }
 }
 
 .foot {
