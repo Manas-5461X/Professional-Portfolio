@@ -185,24 +185,22 @@ export function TimelineAndActivitySection() {
         }
       });
 
-      // Timeline entries progressive scroll reveal with batch
+      // Timeline entries progressive scroll reveal
       const timelineEntries = gsap.utils.toArray<HTMLElement>('.timeline-entry', sectionRef.current);
-      if (timelineEntries.length > 0) {
-        ScrollTrigger.batch(timelineEntries, {
-          start: 'top 88%',
-          once: true,
-          onEnter: (batch) => {
-            gsap.from(batch, {
-              y: 32,
-              autoAlpha: 0,
-              duration: 0.75,
-              stagger: 0.1,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity,visibility'
-            });
+      timelineEntries.forEach((entry) => {
+        gsap.from(entry, {
+          y: 32,
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity,visibility',
+          scrollTrigger: {
+            trigger: entry,
+            start: 'top 88%',
+            once: true
           }
         });
-      }
+      });
 
       // Public GitHub Activity header & profile button
       gsap.from('[data-github-header]', {
@@ -220,22 +218,20 @@ export function TimelineAndActivitySection() {
 
       // GitHub Stats Grid
       const stats = gsap.utils.toArray<HTMLElement>('.github-stat-item', sectionRef.current);
-      if (stats.length > 0) {
-        ScrollTrigger.batch(stats, {
-          start: 'top 88%',
-          once: true,
-          onEnter: (batch) => {
-            gsap.from(batch, {
-              y: 24,
-              autoAlpha: 0,
-              duration: 0.65,
-              stagger: 0.08,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity,visibility'
-            });
+      stats.forEach((stat) => {
+        gsap.from(stat, {
+          y: 24,
+          autoAlpha: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity,visibility',
+          scrollTrigger: {
+            trigger: stat,
+            start: 'top 88%',
+            once: true
           }
         });
-      }
+      });
 
       // Contribution Matrix
       gsap.from('[data-github-matrix]', {
@@ -253,22 +249,20 @@ export function TimelineAndActivitySection() {
 
       // Verified Highlights milestones
       const milestones = gsap.utils.toArray<HTMLElement>('.milestone-card', sectionRef.current);
-      if (milestones.length > 0) {
-        ScrollTrigger.batch(milestones, {
-          start: 'top 88%',
-          once: true,
-          onEnter: (batch) => {
-            gsap.from(batch, {
-              y: 32,
-              autoAlpha: 0,
-              duration: 0.75,
-              stagger: 0.1,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity,visibility'
-            });
+      milestones.forEach((card) => {
+        gsap.from(card, {
+          y: 32,
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity,visibility',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 88%',
+            once: true
           }
         });
-      }
+      });
     },
     { scope: sectionRef }
   );
@@ -299,7 +293,7 @@ export function TimelineAndActivitySection() {
             {/* Mobile swipe helper */}
             <div className="mb-3 flex items-center justify-between sm:hidden font-mono text-[11px] text-[var(--muted)]">
               <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">Milestones</span>
-              <span>← Swipe timeline (6) →</span>
+              <span>← Swipe timeline ({TIMELINE.length}) →</span>
             </div>
 
             <ol
@@ -314,7 +308,9 @@ export function TimelineAndActivitySection() {
                   <div className="sm:col-span-4">
                     <div className="flex items-center justify-between sm:block">
                       <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
-                      <span className="font-mono text-[10px] text-[var(--muted)] sm:hidden">0{idx + 1} / 06</span>
+                      <span className="font-mono text-[10px] text-[var(--muted)] sm:hidden">
+                        {String(idx + 1).padStart(2, '0')} / {String(TIMELINE.length).padStart(2, '0')}
+                      </span>
                     </div>
                     <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">
                       {entry.category}

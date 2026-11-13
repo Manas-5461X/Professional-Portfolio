@@ -79,24 +79,22 @@ export function SkillsSection() {
         }
       });
 
-      // Category rows entrance with batch on scroll (Desktop)
+      // Category rows entrance on scroll (Desktop)
       const rows = gsap.utils.toArray<HTMLElement>('.skill-category-row', sectionRef.current);
-      if (rows.length > 0) {
-        ScrollTrigger.batch(rows, {
-          start: 'top 90%',
-          once: true,
-          onEnter: (batch) => {
-            gsap.from(batch, {
-              y: 28,
-              autoAlpha: 0,
-              duration: 0.7,
-              stagger: 0.08,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity,visibility'
-            });
+      rows.forEach((row) => {
+        gsap.from(row, {
+          y: 32,
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity,visibility',
+          scrollTrigger: {
+            trigger: row,
+            start: 'top 88%',
+            once: true
           }
         });
-      }
+      });
     },
     { scope: sectionRef }
   );
