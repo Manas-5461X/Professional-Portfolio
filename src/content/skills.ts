@@ -22,125 +22,414 @@ export interface ExploringTopic {
   repoUrl?: string;
 }
 
+
 export const SKILL_CATEGORIES: SkillCategory[] = [
   {
     id: 'frontend',
     index: '01',
     title: 'Frontend Development',
-    summary: 'Component architecture, interactive editors, and responsive styling across modern React toolchains.',
+    summary:
+      'Building responsive interfaces, reusable components, and interactive web experiences using modern frontend technologies.',
     items: [
-      { name: 'HTML', maturity: 'applied', evidence: 'Semantic landmarks & accessible forms across web apps' },
-      { name: 'CSS', maturity: 'applied', evidence: 'Custom properties, responsive layout systems & themes' },
-      { name: 'JavaScript', maturity: 'applied', evidence: 'DevGuard Pro client scanner & editor state', projectSlug: 'devguard-pro' },
-      { name: 'React', maturity: 'applied', evidence: 'React 18/19 SPAs in CodeForensics, DevGuard Pro & SecScan.io', projectSlug: 'codeforensics' },
-      { name: 'Vite', maturity: 'applied', evidence: 'Build & HMR pipeline across all three web platforms', projectSlug: 'devguard-pro' },
-      { name: 'Tailwind CSS', maturity: 'applied', evidence: 'Design systems in DevGuard Pro, CodeForensics & SecScan.io', projectSlug: 'secscan-io' }
-    ]
+      {
+        name: 'HTML',
+        maturity: 'applied',
+        evidence: 'Semantic markup, accessible forms, and structured web interfaces.',
+      },
+      {
+        name: 'CSS',
+        maturity: 'applied',
+        evidence: 'Responsive layouts, custom styling, animations, and theme systems.',
+      },
+      {
+        name: 'JavaScript',
+        maturity: 'applied',
+        evidence: 'Application logic, interactive interfaces, API integration, and client-side functionality.',
+      },
+      {
+        name: 'React',
+        maturity: 'applied',
+        evidence: 'Component-based applications and interactive developer tools.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'TypeScript',
+        maturity: 'applied',
+        evidence: 'Typed application architecture and frontend/backend development.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'Vite',
+        maturity: 'applied',
+        evidence: 'Frontend development, build tooling, and HMR workflows.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'Tailwind CSS',
+        maturity: 'applied',
+        evidence: 'Responsive interfaces and reusable styling systems.',
+        projectSlug: 'devguard-pro',
+      },
+    ],
   },
+
   {
     id: 'backend',
     index: '02',
-    title: 'Backend Development and APIs',
-    summary: 'Stateless REST services, database schemas, auth verification, and queue-driven workers.',
+    title: 'Backend Development & APIs',
+    summary:
+      'Developing server-side applications, integrating external services, and working with databases and authentication systems.',
     items: [
-      { name: 'REST APIs', maturity: 'applied', evidence: 'Fastify 5 API in CodeForensics; Express 5 API in SecScan.io', projectSlug: 'codeforensics' },
-      { name: 'Firebase', maturity: 'applied', evidence: 'Firebase Auth & UID-scoped Firestore rules in DevGuard Pro', projectSlug: 'devguard-pro' },
-      { name: 'Supabase', maturity: 'exploring', evidence: 'PostgreSQL BaaS evaluation and auth workflows' },
-      { name: 'Database integration', maturity: 'applied', evidence: 'Prisma ORM + PostgreSQL 16 schema & migrations in CodeForensics', projectSlug: 'codeforensics' },
-      { name: 'Authentication fundamentals', maturity: 'applied', evidence: 'Bearer token verification via Firebase Admin SDK in Fastify', projectSlug: 'codeforensics' },
-      { name: 'API development and integration', maturity: 'applied', evidence: 'GitHub REST/Octokit, OSV.dev CVE queries & Gemini REST bridge', projectSlug: 'secscan-io' }
-    ]
+      {
+        name: 'Node.js',
+        maturity: 'applied',
+        evidence: 'JavaScript runtime for backend services and application development.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'Express.js',
+        maturity: 'applied',
+        evidence: 'Backend API development and middleware-based request handling.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'Fastify',
+        maturity: 'applied',
+        evidence: 'REST API architecture and backend services.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'REST APIs',
+        maturity: 'applied',
+        evidence: 'Building API endpoints and integrating external services.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'Firebase',
+        maturity: 'applied',
+        evidence: 'Firebase Authentication and Firestore integration.',
+        projectSlug: 'devguard-pro',
+      },
+      {
+        name: 'PostgreSQL',
+        maturity: 'applied',
+        evidence: 'Relational database design, queries, and application integration.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'Prisma ORM',
+        maturity: 'applied',
+        evidence: 'Database models, migrations, and relational data access.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'API Integration',
+        maturity: 'applied',
+        evidence: 'Working with GitHub REST APIs, OSV.dev, and AI service integrations.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'Authentication',
+        maturity: 'applied',
+        evidence: 'Authentication workflows, token verification, and user-scoped access.',
+        projectSlug: 'codeforensics',
+      },
+    ],
   },
+
   {
     id: 'languages',
     index: '03',
     title: 'Programming Languages',
-    summary: 'Typed application code, systems scripting, and core algorithmic problem solving.',
+    summary:
+      'Working across scripting, application development, and systems-oriented programming.',
     items: [
-      { name: 'Python', maturity: 'applied', evidence: 'DPI Engine binary packet parser & ML practice repositories', projectSlug: 'dpi-engine' },
-      { name: 'Java', maturity: 'applied', evidence: 'Coursework OOP, DSA & codecrafters-shell-java exploration' },
-      { name: 'C++', maturity: 'applied', evidence: 'Systems fundamentals & memory-safety rules studied for DPI/DevGuard' }
-    ]
+      {
+        name: 'Python',
+        maturity: 'applied',
+        evidence: 'Packet parsing, network analysis, scripting, and machine learning practice.',
+        projectSlug: 'dpi-engine',
+      },
+      {
+        name: 'JavaScript',
+        maturity: 'applied',
+        evidence: 'Frontend and backend application development.',
+      },
+      {
+        name: 'TypeScript',
+        maturity: 'applied',
+        evidence: 'Type-safe application development and structured codebases.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'Java',
+        maturity: 'applied',
+        evidence: 'Object-oriented programming, data structures, and algorithmic problem solving.',
+      },
+      {
+        name: 'C++',
+        maturity: 'applied',
+        evidence: 'Programming fundamentals, data structures, and systems concepts.',
+      },
+    ],
   },
+
   {
     id: 'ai-ml',
     index: '04',
-    title: 'AI and Machine Learning',
-    summary: 'Foundational ML implementation alongside practical LLM orchestration and fallback design.',
+    title: 'AI & Machine Learning',
+    summary:
+      'Exploring machine learning model development while building practical applications powered by modern AI systems.',
     items: [
-      { name: 'Machine Learning fundamentals', maturity: 'exploring', evidence: 'Regular problem solving in deep-ml & TensorTonic-Solutions repos' },
-      { name: 'AI application development', maturity: 'applied', evidence: '4-model Gemini fallback bridge & JSON parsing in DevGuard Pro', projectSlug: 'devguard-pro' },
-      { name: 'OpenCV', maturity: 'exploring', evidence: 'Computer vision pipeline experiments & image processing basics' },
-      { name: 'Data Analytics', maturity: 'exploring', evidence: 'Repository churn metrics, statistical co-change & study notes' },
-      { name: 'LLM and AI tooling exploration', maturity: 'exploring', evidence: 'Grounded vs hallucinated code explanations in CodeForensics', projectSlug: 'codeforensics' }
-    ]
+      {
+        name: 'Machine Learning',
+        maturity: 'exploring',
+        evidence: 'Learning model development, training, evaluation, and core ML algorithms.',
+      },
+      {
+        name: 'AI Model Development',
+        maturity: 'exploring',
+        evidence: 'Experimenting with building, training, and evaluating machine learning models.',
+      },
+      {
+        name: 'AI Application Development',
+        maturity: 'applied',
+        evidence: 'Integrating AI capabilities and model responses into developer-focused applications.',
+        projectSlug: 'devguard-pro',
+      },
+      {
+        name: 'Large Language Models',
+        maturity: 'exploring',
+        evidence: 'Exploring LLM capabilities, model integrations, and AI-powered workflows.',
+      },
+      {
+        name: 'Retrieval-Augmented Generation',
+        maturity: 'exploring',
+        evidence: 'Learning how retrieval pipelines connect external knowledge with language models.',
+      },
+      {
+        name: 'AI Engineering',
+        maturity: 'exploring',
+        evidence: 'Experimenting with model integrations, prompting, structured outputs, and AI application architecture.',
+      },
+    ],
   },
+
   {
     id: 'cybersecurity',
     index: '05',
-    title: 'Cybersecurity and Networking',
-    summary: 'Static analysis heuristics, vulnerability correlation, and binary packet inspection.',
+    title: 'Cybersecurity & Networking',
+    summary:
+      'Exploring application security, repository analysis, network protocols, and security-focused software engineering.',
     items: [
-      { name: 'Cybersecurity fundamentals', maturity: 'applied', evidence: 'OWASP injection/XSS/secret rules & path traversal defense', projectSlug: 'devguard-pro' },
-      { name: 'OSINT', maturity: 'exploring', evidence: 'Public repository secret exposure & artifact discovery concepts', projectSlug: 'secscan-io' },
-      { name: 'Computer Networks', maturity: 'applied', evidence: 'Ethernet/IPv4/TCP/UDP header decoding in DPI Engine', projectSlug: 'dpi-engine' },
-      { name: 'Network Analysis', maturity: 'applied', evidence: 'PCAP binary framing, 5-tuple flow tables & TLS SNI extraction', projectSlug: 'dpi-engine' },
-      { name: 'Security-focused development', maturity: 'applied', evidence: 'Helmet, Zod validation, Firestore UID isolation & non-executing AST reads', projectSlug: 'codeforensics' }
-    ]
+      {
+        name: 'Cybersecurity Fundamentals',
+        maturity: 'applied',
+        evidence: 'Security rules covering injection, XSS, exposed secrets, and unsafe code patterns.',
+        projectSlug: 'devguard-pro',
+      },
+      {
+        name: 'Static Code Analysis',
+        maturity: 'applied',
+        evidence: 'Analyzing source code and identifying potentially unsafe patterns.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'OSINT',
+        maturity: 'exploring',
+        evidence: 'Exploring public-source intelligence, repository investigation, and digital footprint discovery.',
+      },
+      {
+        name: 'Computer Networks',
+        maturity: 'applied',
+        evidence: 'Working with Ethernet, IPv4, TCP, UDP, and network protocol fundamentals.',
+        projectSlug: 'dpi-engine',
+      },
+      {
+        name: 'Network Analysis',
+        maturity: 'applied',
+        evidence: 'PCAP parsing, packet inspection, flow analysis, and TLS SNI extraction.',
+        projectSlug: 'dpi-engine',
+      },
+      {
+        name: 'Application Security',
+        maturity: 'applied',
+        evidence: 'Input validation, security middleware, authentication, and access-control considerations.',
+        projectSlug: 'codeforensics',
+      },
+    ],
   },
+
   {
     id: 'cs-core',
     index: '06',
-    title: 'Computer Science',
-    summary: 'Core undergraduate foundations supporting clean architecture and systems debugging.',
+    title: 'Computer Science Fundamentals',
+    summary:
+      'Building strong foundations in algorithms, databases, object-oriented design, and problem solving.',
     items: [
-      { name: 'Data Structures and Algorithms', maturity: 'applied', evidence: 'Graph lineage traversal, flow hash tables & DSA revision tracking' },
-      { name: 'DBMS', maturity: 'applied', evidence: 'Relational indexing, compound unique keys & cascade constraints', projectSlug: 'codeforensics' },
-      { name: 'SQL', maturity: 'applied', evidence: 'PostgreSQL migrations & Prisma-backed relational querying', projectSlug: 'codeforensics' },
-      { name: 'Object-Oriented Programming', maturity: 'applied', evidence: 'Modular scanner engines & Java/TypeScript class hierarchies' },
-      { name: 'Problem Solving', maturity: 'applied', evidence: 'Root-cause regression analysis & algorithmic exercises' }
-    ]
+      {
+        name: 'Data Structures & Algorithms',
+        maturity: 'applied',
+        evidence: 'Algorithmic problem solving, graph traversal, trees, and complexity analysis.',
+      },
+      {
+        name: 'Database Management Systems',
+        maturity: 'applied',
+        evidence: 'Relational database concepts, schema design, indexing, and constraints.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'SQL',
+        maturity: 'applied',
+        evidence: 'Relational queries, PostgreSQL, and database operations.',
+        projectSlug: 'codeforensics',
+      },
+      {
+        name: 'Object-Oriented Programming',
+        maturity: 'applied',
+        evidence: 'Object-oriented design and modular application architecture.',
+      },
+      {
+        name: 'Operating Systems',
+        maturity: 'exploring',
+        evidence: 'Learning processes, memory management, concurrency, and operating system fundamentals.',
+      },
+      {
+        name: 'Computer Networks',
+        maturity: 'applied',
+        evidence: 'Understanding network layers, protocols, packet structures, and communication.',
+        projectSlug: 'dpi-engine',
+      },
+      {
+        name: 'Problem Solving',
+        maturity: 'applied',
+        evidence: 'Practicing algorithmic challenges and debugging programming problems.',
+      },
+    ],
   },
+
+  {
+    id: 'systems',
+    index: '07',
+    title: 'Systems Programming',
+    summary:
+      'Understanding low-level software concepts through networking tools, command-line applications, and systems experimentation.',
+    items: [
+      {
+        name: 'Linux',
+        maturity: 'applied',
+        evidence: 'Working with Linux environments, command-line tools, and shell workflows.',
+      },
+      {
+        name: 'Shell Programming',
+        maturity: 'applied',
+        evidence: 'Exploring shell implementation and command execution fundamentals.',
+      },
+      {
+        name: 'Packet Parsing',
+        maturity: 'applied',
+        evidence: 'Implementing binary packet parsing and protocol decoding.',
+        projectSlug: 'dpi-engine',
+      },
+      {
+        name: 'Concurrency',
+        maturity: 'exploring',
+        evidence: 'Learning concurrent execution and multiprocessing concepts.',
+      },
+      {
+        name: 'Memory & Processes',
+        maturity: 'exploring',
+        evidence: 'Studying process execution, memory handling, and low-level computing concepts.',
+      },
+    ],
+  },
+
   {
     id: 'devtools',
-    index: '07',
-    title: 'Developer Tools',
-    summary: 'Version control, Unix environments, HTTP debugging, and container packaging.',
+    index: '08',
+    title: 'Developer Tools & Platforms',
+    summary:
+      'Using modern development tools, version control, and deployment workflows to build and maintain software.',
     items: [
-      { name: 'Git', maturity: 'applied', evidence: 'Daily branch workflows & git history/provenance analysis', projectSlug: 'codeforensics' },
-      { name: 'GitHub', maturity: 'applied', evidence: '31 public repos, GitHub Actions telemetry & GitHub App integration', projectSlug: 'codeforensics' },
-      { name: 'VS Code', maturity: 'applied', evidence: 'Primary IDE plus embedded Monaco Editor integration', projectSlug: 'devguard-pro' },
-      { name: 'Linux', maturity: 'applied', evidence: 'System administration coursework & POSIX shell experimentation' },
-      { name: 'Postman', maturity: 'applied', evidence: 'REST endpoint inspection for Fastify & Express backends' },
-      { name: 'Docker fundamentals', maturity: 'exploring', evidence: 'Compose setup for Postgres/Redis & multi-stage SecScan images', projectSlug: 'secscan-io' }
-    ]
-  }
+      {
+        name: 'Git',
+        maturity: 'applied',
+        evidence: 'Version control, branching, commits, and repository management.',
+      },
+      {
+        name: 'GitHub',
+        maturity: 'applied',
+        evidence: 'Maintaining public repositories and collaborating through GitHub workflows.',
+      },
+      {
+        name: 'VS Code',
+        maturity: 'applied',
+        evidence: 'Primary development environment and code editing workflows.',
+      },
+      {
+        name: 'Postman',
+        maturity: 'applied',
+        evidence: 'Testing and inspecting backend API endpoints.',
+      },
+      {
+        name: 'Docker',
+        maturity: 'exploring',
+        evidence: 'Learning containerization, Dockerfiles, and multi-service development environments.',
+        projectSlug: 'secscan-io',
+      },
+      {
+        name: 'Cloud Deployment',
+        maturity: 'applied',
+        evidence: 'Deploying frontend and backend applications using modern hosting platforms.',
+      },
+    ],
+  },
+
+  {
+    id: 'opensource',
+    index: '09',
+    title: 'Open Source & Engineering',
+    summary:
+      'Learning from public codebases, building in public, and improving software through practical engineering.',
+    items: [
+      {
+        name: 'Open-Source Development',
+        maturity: 'applied',
+        evidence: 'Building and maintaining publicly available software projects.',
+      },
+      {
+        name: 'Codebase Exploration',
+        maturity: 'applied',
+        evidence: 'Understanding existing project structures, dependencies, and implementation choices.',
+      },
+      {
+        name: 'Technical Documentation',
+        maturity: 'applied',
+        evidence: 'Documenting project architecture, setup instructions, and technical decisions.',
+      },
+    ],
+  },
 ];
+
+
 
 export const CURRENTLY_EXPLORING: ExploringTopic[] = [
   {
-    topic: 'Machine Learning Math & Algorithms from Scratch',
-    why: 'Understanding matrix operations, loss functions, and optimization without relying purely on high-level wrappers.',
-    evidence: 'Active solutions in deep-ml and TensorTonic-Solutions repositories',
-    repoUrl: 'https://github.com/Manas-5461X/deep-ml'
+    topic: 'AI Model Development & Machine Learning',
+    why: 'Exploring how machine learning models are built, trained, evaluated and improved, while developing a deeper understanding of the mathematics and algorithms behind intelligent systems.',
+    evidence: 'Working through ML algorithms, model implementations, experimentation and AI engineering concepts.'
   },
   {
-    topic: 'Static AST Analysis Beyond Regex',
-    why: 'Moving past line-by-line regex limitations toward syntactic tree traversal and safer code intelligence.',
-    evidence: 'Implemented TypeScript Compiler API symbol indexing in CodeForensics; planned upgrade for DevGuard Pro',
-    repoUrl: 'https://github.com/Manas-5461X/CodeForensics'
+    topic: 'Building a Security-Focused SaaS Platform',
+    why: 'Designing a developer-focused security platform that brings code analysis, vulnerability detection, AI-assisted security insights and developer workflows into one product.',
+    evidence: 'Exploring SaaS architecture, security scanning engines, repository analysis, AI integrations and product infrastructure.'
   },
   {
-    topic: 'Concurrent & Multi-Process Systems Architecture',
-    why: 'Studying how worker queues, flow sharding, and process isolation scale packet and repository processing.',
-    evidence: 'BullMQ + Redis workers in CodeForensics, Python multiprocessing in DPI Engine, and Java shell builds',
-    repoUrl: 'https://github.com/Manas-5461X/DPI_Engine'
-  },
-  {
-    topic: 'OpenCV, Data Analytics & Dockerized Environments',
-    why: 'Broadening practical capability across vision tooling, quantitative analysis, and reproducible container deployments.',
-    evidence: 'DA_Interview study notes, Docker Compose stacks in CodeForensics, and multi-stage Dockerfiles in SecScan.io',
-    repoUrl: 'https://github.com/Manas-5461X/SecScan.io'
+    topic: 'Open-Source Development & Collaboration',
+    why: 'Learning from real-world codebases, exploring how established projects are engineered, identifying security issues and contributing meaningful improvements to the developer ecosystem.',
+    evidence: 'Reviewing open-source repositories, exploring unfamiliar codebases, testing AI-assisted development tools and building publicly available projects.',
+    repoUrl: 'https://github.com/Manas-5461X'
   }
 ];
+
 

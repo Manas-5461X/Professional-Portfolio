@@ -1,7 +1,7 @@
 export interface TimelineEntry {
   period: string;
   title: string;
-  category: 'Education' | 'Engineering' | 'Research';
+  category: string;
   summary: string;
   evidence?: string;
 }
@@ -39,26 +39,26 @@ export const PROFILE = {
   linkedin: 'https://www.linkedin.com/in/manas-gandhi-09a341375/',
   heroHeadline: 'Manas Gandhi',
   heroPositioning:
-    'Software developer exploring the intersection of AI, software engineering and cybersecurity.',
+    'Software developer exploring the intersection of AI-ML, Backend development and cybersecurity.',
   heroSubheadline:
     'I build things, experiment with technologies, and enjoy understanding how software works under the hood.',
   statementReveal:
-    'I enjoy pulling back the abstraction layer to see how packets, parsers, APIs, and interfaces actually behave, then turning those mechanics into working tools.',
-  biographyParagraphs: [
-    "I'm Manas, a second-year Computer Science undergraduate (2025 to 2029) based in Bengaluru. I build software products and small developer tools to test ideas, make sense of unfamiliar systems, and turn coursework concepts into things that actually run.",
-    "What keeps me curious is how connected the stack really is. One week I am refining React interfaces and Monaco editor workflows; the next I am debugging Fastify queues, reading raw Ethernet and TLS frames in Python, or seeing how LLMs fail when you ask them for structured code reviews without strict validation.",
-    "My learning approach is deliberately hands-on: take a system apart until I can trace its failure modes, write a small working implementation from scratch, and ship it in public on GitHub so I can revisit and sharpen the design over time."
-  ],
+    'Curious about how technology works, from intelligent systems and machine learning to the software and security layers that bring ideas to life.',
+
+  biographyParagraphs:
+    [
+      "I'm Manas, a second-year Computer Science undergraduate (2025–2029) based in Bengaluru. I'm passionate about software development, artificial intelligence, machine learning, and cybersecurity. I enjoy turning ideas into working products, experimenting with emerging technologies, and understanding the fundamentals behind them.",
+      "My interests span multiple areas of technology — building web applications with React and JavaScript, exploring machine learning and AI engineering, experimenting with LLMs, RAG pipelines and AI-powered applications, and diving into cybersecurity, networking, and OSINT. I enjoy exploring how these fields intersect and how they can be used to solve practical problems.",
+      "My learning approach is deliberately hands-on: I take systems apart until I can trace their failure modes, build small working implementations from scratch, and ship projects in public on GitHub so I can revisit, refine, and sharpen the design over time. Whether I'm developing intelligent tools, solving algorithmic challenges, or exploring unfamiliar technologies, I believe the best way to understand something is to build it myself."
+    ],
   footerNote:
-    "Written, built, and maintained by Manas Gandhi while exploring full-stack architecture, machine learning fundamentals, and security tooling.",
+    "Written, built, and maintained by Manas Gandhi while exploring full-stack architecture, Artificial Intelligence & machine learning fundamentals, and security tooling.",
   education: {
-    degree: 'Undergraduate Studies in Computer Science',
+    degree: 'Bachelors in Computer Science from BITS PILANI',
     batch: '2025 to 2029',
     standing: 'Second-year undergraduate student',
-    focus: 'Data Structures & Algorithms, DBMS, Computer Networks, Operating Systems, Security, and Applied ML'
+    focus: 'Data Structures & Algorithms, DBMS, Networking, Operating Systems, Security, AI and Applied ML'
   },
-  verificationNote:
-    'All project specs, technology stacks, and contribution counts are verified directly against source code in public GitHub repositories. LinkedIn profile metadata could not be verified programmatically without sign-in, so only explicitly supplied education details are listed.'
 } as const;
 
 export const AREAS_OF_INTEREST: InterestTrack[] = [
@@ -72,7 +72,7 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
       'I study both sides of machine learning: implementing numerical building blocks from scratch in Python and wiring LLMs into applications with strict schemas and fallback handling so outputs stay predictable.',
     currentFocus: [
       'Multi-model Gemini fallback orchestration & JSON schema checks in DevGuard Pro',
-      'Foundational ML math and NumPy problem sets (deep-ml & TensorTonic repos)',
+      'Foundational ML math , NumPy , Pandas & Sklearn',
       'Computer vision experiments with OpenCV and structured data analytics'
     ],
     projectLinks: [{ label: 'DevGuard Pro', slug: 'devguard-pro' }]
@@ -105,9 +105,10 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
     description:
       'I enjoy designing clear server boundaries: validating inputs at the edge, verifying auth tokens properly, modeling PostgreSQL tables cleanly, and pushing heavy work onto Redis/BullMQ queues.',
     currentFocus: [
-      'Fastify 5 & Express 5 REST services with Zod validation and Helmet',
-      'PostgreSQL schemas via Prisma ORM and UID-scoped Firestore rules',
-      'Two-tier asynchronous synchronization with BullMQ and Redis'
+      'Node.js, Express.js, MongoDB and Spring Boot fundamentals',
+      'Building RESTful APIs with authentication, validation and error handling',
+      'Working with PostgreSQL, SQL, Prisma ORM and database design',
+      'Exploring backend architecture, API integration and asynchronous processing'
     ],
     projectLinks: [
       { label: 'CodeForensics', slug: 'codeforensics' },
@@ -124,9 +125,11 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
     description:
       'Rather than treating security as a checklist added at the end, I like building tools that inspect untrusted inputs safely: heuristic secret scanners, OSV.dev dependency CVE lookups, and path-traversal guards.',
     currentFocus: [
-      'Comment-aware regex & OWASP rule engines in DevGuard Pro',
-      'GitHub tree scanning and OSV.dev npm CVE correlation in SecScan.io',
-      'Non-executing AST analysis with strict path containment in CodeForensics'
+      'Security testing and vulnerability assessment of open-source repositories',
+      'Evaluating AI/LLM models for security weaknesses, prompt injection and unsafe outputs',
+      'Exploring AI security, model behavior and adversarial testing techniques',
+      'Static code analysis, secret detection and OWASP-aligned security checks',
+      'Investigating dependency vulnerabilities and potential attack surfaces'
     ],
     projectLinks: [
       { label: 'DevGuard Pro', slug: 'devguard-pro' },
@@ -143,9 +146,11 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
     description:
       'Protocols make much more sense once you decode the bytes yourself. I built DPI Engine in Python to parse Ethernet, IPv4, TCP, and UDP headers manually and extract TLS SNI hostnames across worker processes.',
     currentFocus: [
-      'Binary PCAP global/packet header parsing without external packet libraries',
-      'Consistent 5-tuple flow sharding across multi-process load balancers',
-      'TLS ClientHello SNI inspection and stateful YAML/CLI filtering'
+      'Understanding TCP/IP, OSI layers, subnetting, routing and network protocols',
+      'Analyzing Ethernet, IPv4, TCP and UDP packet structures',
+      'Exploring DNS, DHCP, NAT, HTTP/HTTPS and TLS handshake mechanisms',
+      'Experimenting with packet capture, traffic inspection and network troubleshooting',
+      'Learning network security, traffic analysis and deep packet inspection (DPI)'
     ],
     projectLinks: [{ label: 'DPI Engine', slug: 'dpi-engine' }]
   },
@@ -158,9 +163,11 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
     description:
       'I spend time thinking about structure after the prototype works: shared types across monorepo packages, deterministic fallbacks when external APIs rate-limit, and automated Vitest suites that catch regressions.',
     currentFocus: [
-      'TypeScript monorepo separation (API, worker, web, shared packages)',
-      '25 Vitest unit and integration suites across parsing and routes',
-      'POSIX shell experiments in Java and clean system documentation'
+      'Writing clean, modular and maintainable code with Java, C++, JavaScript and Python',
+      'Designing scalable application structures and reusable software components',
+      'Version control, Git workflows, collaborative development and open-source contributions',
+      'Debugging, testing, performance optimization and handling edge cases',
+      'Exploring software architecture, design patterns and engineering best practices'
     ],
     projectLinks: [
       { label: 'CodeForensics', slug: 'codeforensics' },
@@ -169,91 +176,119 @@ export const AREAS_OF_INTEREST: InterestTrack[] = [
   }
 ];
 
+
 export const TIMELINE: TimelineEntry[] = [
   {
-    period: '2025 to 2029',
-    title: 'Computer Science Undergraduate Program',
+    period: '2025 – 2029',
+    title: 'Computer Science Undergraduate',
     category: 'Education',
     summary:
-      'Currently in the second year of undergraduate Computer Science studies, building coursework and independent software systems around algorithms, databases, networking, and security.'
+      'Pursuing undergraduate studies in Computer Science, exploring software engineering, AI/ML, cybersecurity, networking, databases and systems. Building a strong foundation through coursework, independent learning and hands-on projects.'
   },
   {
-    period: 'Aug to Oct 2025',
-    title: 'Foundations on GitHub & Early Web Systems',
-    category: 'Engineering',
+    period: '2025 – Present',
+    title: 'Academic Journey — BITS Pilani & Scaler',
+    category: 'Education',
     summary:
-      'Established public GitHub workspace (Manas-5461X) and began shipping core HTML, CSS, JavaScript, and DOM fundamentals alongside structured DSA practice.'
+      'Building an interdisciplinary foundation through Computer Science and AI/ML studies, combining academic learning with practical software development, problem-solving and independent engineering projects.'
   },
   {
-    period: 'May 2026',
-    title: 'SecScan.io: Automated Repository Security Scanner',
-    category: 'Engineering',
+    period: '2025',
+    title: 'From Fundamentals to Building Software',
+    category: 'Development',
     summary:
-      'Built a decoupled Express 5 + TypeScript and React 19 security scanner integrating the GitHub REST tree API and OSV.dev vulnerability database with containerized Dockerfiles.',
-    evidence: 'Shipped live at sec-scan-io.vercel.app'
+      'Started exploring web development, JavaScript, Java, C++, Python and Data Structures & Algorithms. Built foundational projects, experimented with APIs, and began developing a public GitHub portfolio.'
   },
   {
-    period: 'Jun to Jul 2026',
-    title: 'DevGuard Pro & Systems Shell Exploration',
-    category: 'Engineering',
+    period: '2025 – 2026',
+    title: 'Full-Stack Development & Product Building',
+    category: 'Full Stack',
     summary:
-      'Created DevGuard Pro (Monaco Editor + 34 comment-aware regex rules + Firebase Auth/Firestore + Gemini fallback loop) while building a Java POSIX-style shell and C CLI labs.',
-    evidence: 'Shipped live at dev-guard-omega.vercel.app'
+      'Built ShopKart, a full-stack e-commerce application with product management, frontend-backend integration, database operations and payment gateway integration. Also explored application development through independent projects like Job Tracker.'
   },
   {
-    period: 'Sep to Oct 2026',
-    title: 'DPI Engine & Applied Machine Learning Practice',
-    category: 'Research',
+    period: '2026',
+    title: 'AI Engineering, Resume Intelligence & RAG',
+    category: 'Artificial Intelligence',
     summary:
-      'Implemented a multi-processed Python PCAP deep packet inspection engine (24 GitHub stars) and maintained consistent applied ML practice repositories (deep-ml and TensorTonic-Solutions).',
-    evidence: '24 stars on Manas-5461X/DPI_Engine'
+      'Explored LLM-powered applications, resume parsing, structured information extraction, semantic matching and Retrieval-Augmented Generation (RAG). Experimented with document processing, AI-assisted evaluation and intelligent application workflows.'
   },
   {
-    period: 'Oct to Nov 2026',
-    title: 'CodeForensics: AST Archaeology & Evidence Graph',
-    category: 'Engineering',
+    period: '2026',
+    title: 'SecScan.io — Repository Security Scanner',
+    category: 'Cybersecurity',
     summary:
-      'Architected a TypeScript monorepo combining Fastify 5, React 18, Prisma/PostgreSQL, BullMQ/Redis, and the TypeScript Compiler API with 25 automated Vitest test suites.',
-    evidence: 'Shipped live at codeforensics-dev.vercel.app'
+      'Developed an automated repository security scanner using Express, TypeScript and React. Integrated GitHub repository analysis with OSV.dev vulnerability intelligence to identify vulnerable dependencies and security risks.'
+  },
+  {
+    period: '2026',
+    title: 'DevGuard Pro — Developer Security Platform',
+    category: 'Developer Tools',
+    summary:
+      'Built a developer-focused security platform combining static analysis, secret detection, security rules, GitHub integration and AI-assisted code analysis. Explored local scanning, security reporting and developer workflow integrations.'
+  },
+  {
+    period: '2026',
+    title: 'CodeCrafter Journey — Custom Shell',
+    category: 'Systems Programming',
+    summary:
+      'Explored operating system concepts and command-line internals by building a custom shell. Worked on command execution, shell behavior, process interaction and understanding how command-line environments operate under the hood.'
+  },
+  {
+    period: '2026',
+    title: 'DPI Engine — Deep Packet Inspection',
+    category: 'Networking & Research',
+    summary:
+      'Built a Python-based deep packet inspection engine to explore network traffic at the byte level. Worked with PCAP parsing, Ethernet, IPv4, TCP, UDP, TLS ClientHello inspection and multi-process traffic analysis.'
+  },
+  {
+    period: '2026',
+    title: 'CodeForensics — Source Code Intelligence',
+    category: 'Software Engineering',
+    summary:
+      'Developed a source-code analysis platform exploring AST-based inspection, code structure analysis, evidence relationships and automated security-oriented analysis using TypeScript and modern backend infrastructure.'
   }
 ];
+
+
 
 export const VERIFIED_MILESTONES: VerifiedMilestone[] = [
   {
     id: 'dpi-stars',
     metric: '24 Stars',
-    label: 'Community Recognition on DPI_Engine',
+    label: 'Open-source Community Recognition',
     detail:
-      'Open-source Python PCAP inspection and TLS SNI classification engine earned 24 stars on GitHub without external marketing.',
-    sourceLabel: 'GitHub Repository',
+      'DPI Engine, a Python-based Deep Packet Inspection project for PCAP parsing, network protocol analysis and TLS SNI inspection, gained 24 GitHub stars through organic community discovery.',
+    sourceLabel: 'DPI Engine Repository',
     sourceUrl: 'https://github.com/Manas-5461X/DPI_Engine'
   },
   {
-    id: 'live-deployments',
-    metric: '3 Deployed',
-    label: 'Live Security & Analysis Web Platforms',
+    id: 'engineering',
+    metric: 'Full Stack + Systems',
+    label: 'Engineering Across the Stack',
     detail:
-      'CodeForensics, DevGuard Pro, and SecScan.io are publicly deployed and returning live HTTP 200 responses on Vercel.',
+      'Built end-to-end applications like ShopKart with payment gateway integration, alongside systems-level projects including a custom shell and DPI Engine. Exploring everything from application architecture to processes, protocols and low-level computing.',
     sourceLabel: 'GitHub Repositories',
     sourceUrl: 'https://github.com/Manas-5461X?tab=repositories'
   },
   {
-    id: 'contrib-year',
+    id: 'contributions',
     metric: '957',
-    label: 'Verified Contributions in 12-Month Snapshot',
+    label: 'GitHub Contributions in 12 Months',
     detail:
-      'Recorded across 141 active days between Nov 2025 and Nov 2026, with a 12-day longest streak and 48 peak daily contributions.',
-    sourceLabel: 'Profile Telemetry Data',
-    sourceUrl: 'https://github.com/Manas-5461X/Manas-5461X'
+      'Recorded 957 GitHub contributions across 141 active days between November 2025 and November 2026, reflecting a combination of software development, repository activity and coding practice.',
+    sourceLabel: 'GitHub Profile',
+    sourceUrl: 'https://github.com/Manas-5461X'
   },
   {
-    id: 'test-suites',
-    metric: '25 Suites',
-    label: 'Automated Tests in CodeForensics Monorepo',
+    id: 'ai-rag',
+    metric: 'AI + RAG',
+    label: 'Applied AI & LLM Engineering',
     detail:
-      'Vitest unit and integration test suites across API routes, AST archaeology, relationship engines, UI components, and worker pipelines.',
-    sourceLabel: 'CodeForensics Tests',
-    sourceUrl: 'https://github.com/Manas-5461X/CodeForensics'
+      'Exploring machine learning, LLM-powered applications, resume parsing, document intelligence and Retrieval-Augmented Generation (RAG) to build practical AI-driven tools.',
+    sourceLabel: 'GitHub Repositories',
+    sourceUrl: 'https://github.com/Manas-5461X?tab=repositories'
   }
 ];
+
 
