@@ -16,24 +16,8 @@ export function AboutSection() {
               Curious about the whole stack, not just one layer.
             </h2>
 
-            <dl className="mt-8 space-y-4 border-t border-[var(--line)] pt-5 text-sm">
-              <div>
-                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Academic Track</dt>
-                <dd className="mt-1 font-medium text-[var(--fg)]">{PROFILE.education.standing}</dd>
-                <dd className="text-[var(--fg-2)]">Computer Science · {PROFILE.education.batch}</dd>
-              </div>
-              <div className="border-t border-[var(--line)] pt-4">
-                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Location</dt>
-                <dd className="mt-1 text-[var(--fg-2)]">{PROFILE.location}</dd>
-              </div>
-              <div className="border-t border-[var(--line)] pt-4">
-                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Core Study</dt>
-                <dd className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{PROFILE.education.focus}</dd>
-              </div>
-            </dl>
-
             {/* Editorial Builder Blueprint Card */}
-            <figure className="mt-8 mx-auto max-w-sm lg:max-w-none overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-sm">
+            <figure className="mt-6 mx-auto max-w-sm lg:max-w-none overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-sm">
               <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
                 <img
                   src="/images/about-portrait.jpg"
@@ -51,6 +35,22 @@ export function AboutSection() {
                 <span className="tracking-wider text-[var(--muted)]">EST. 2026</span>
               </figcaption>
             </figure>
+
+            <dl className="mt-6 space-y-4 border-t border-[var(--line)] pt-5 text-sm">
+              <div>
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Academic Track</dt>
+                <dd className="mt-1 font-medium text-[var(--fg)]">{PROFILE.education.standing}</dd>
+                <dd className="text-[var(--fg-2)]">Computer Science · {PROFILE.education.batch}</dd>
+              </div>
+              <div className="border-t border-[var(--line)] pt-4">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Location</dt>
+                <dd className="mt-1 text-[var(--fg-2)]">{PROFILE.location}</dd>
+              </div>
+              <div className="border-t border-[var(--line)] pt-4">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">Core Study</dt>
+                <dd className="mt-1 text-xs leading-relaxed text-[var(--muted)]">{PROFILE.education.focus}</dd>
+              </div>
+            </dl>
           </div>
 
           <div className="space-y-6 lg:col-span-8 lg:border-l lg:border-[var(--line)] lg:pl-10">
