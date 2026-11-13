@@ -9,10 +9,30 @@ import { RouteCurtain } from './components/RouteCurtain';
 import { CustomCursor } from './components/CustomCursor';
 import { HomePage } from './pages/HomePage';
 
-const ProjectCaseStudyPage = lazy(() =>
+function lazyWithRetry<T extends { default: React.ComponentType<any> }>(
+  componentImport: () => Promise<T>
+) {
+  return lazy(async () => {
+    const pageHasBeenRefreshed = sessionStorage.getItem('chunk_retry');
+    try {
+      const component = await componentImport();
+      sessionStorage.removeItem('chunk_retry');
+      return component;
+    } catch (error) {
+      if (!pageHasBeenRefreshed) {
+        sessionStorage.setItem('chunk_retry', 'true');
+        window.location.reload();
+        return new Promise<T>(() => {});
+      }
+      throw error;
+    }
+  });
+}
+
+const ProjectCaseStudyPage = lazyWithRetry(() =>
   import('./pages/ProjectCaseStudyPage').then((m) => ({ default: m.ProjectCaseStudyPage }))
 );
-const NotFoundPage = lazy(() =>
+const NotFoundPage = lazyWithRetry(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
 

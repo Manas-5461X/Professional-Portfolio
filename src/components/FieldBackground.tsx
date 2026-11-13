@@ -7,8 +7,7 @@ import {
   Color,
   ShaderMaterial,
   PlaneGeometry,
-  Mesh,
-  Clock
+  Mesh
 } from 'three';
 import { isReducedMotion, scrollState } from '../lib/smooth';
 import { useTheme } from '../hooks/useTheme';
@@ -153,12 +152,12 @@ export function FieldBackground() {
 
     let visible = true;
     let raf = 0;
-    const clock = new Clock();
+    const startTime = performance.now();
 
     const frame = () => {
       raf = 0;
       if (!visible || document.hidden) return;
-      uniforms.uTime.value = isReducedMotion() ? 12 : clock.getElapsedTime();
+      uniforms.uTime.value = isReducedMotion() ? 12 : (performance.now() - startTime) / 1000;
       uniforms.uVel.value += ((scrollState.velocity || 0) * 8 - uniforms.uVel.value) * 0.08;
       uniforms.uMouse.value.lerp(target, 0.06);
       renderer.render(scene, camera);
