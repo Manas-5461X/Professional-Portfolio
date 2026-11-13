@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { PROFILE } from '../content/profile';
 
@@ -315,14 +316,14 @@ export function Footer() {
             </span>
           </a>
 
-          {/* Resume download hidden for now as requested */}
-          {/* <a
-            href="/resume.pdf"
-            download
-            className="pill solid light"
+          <Link
+            to="/exploring"
+            className="pill light w-full sm:w-auto justify-center"
           >
-            <span className="dot" /> Download resume (PDF)
-          </a> */}
+            <span className="dot" />
+            <span>See what I am currently exploring</span>
+            <span className="arrow">&#8599;</span>
+          </Link>
 
           <a
             href={`mailto:${PROFILE.email}`}
