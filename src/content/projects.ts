@@ -630,6 +630,15 @@ export function getProjectThemeColor(
 
 export function getCurtainForPath(path: string): { label: string; bg: string; fg: string } {
   const clean = path.replace(/#.*$/, '').replace(/\/+$/, '') || '/';
+
+  if (clean === '/exploring') {
+    return {
+      label: 'Exploring',
+      bg: '#FF4D1C',
+      fg: '#0B0B0A'
+    };
+  }
+
   for (let i = 0; i < PROJECTS.length; i++) {
     const p = PROJECTS[i];
     if (clean === `/projects/${p.slug}`) {

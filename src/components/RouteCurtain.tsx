@@ -57,12 +57,20 @@ export function RouteCurtain() {
         return;
       }
 
-      // Check if this navigation involves a project route or route transition
+      // Check if this navigation involves a route transition (projects, exploring, or back to home)
       const isTargetProject = targetPath.startsWith('/projects/');
       const isCurrentProject = currentPath.startsWith('/projects/');
+      const isTargetExploring = targetPath === '/exploring';
+      const isCurrentExploring = currentPath === '/exploring';
       const isTargetHome = targetPath === '/' || targetPath === '';
 
-      const shouldAnimate = isTargetProject || (isCurrentProject && isTargetHome);
+      const shouldAnimate =
+        isTargetProject ||
+        isTargetExploring ||
+        ((isCurrentProject || isCurrentExploring) && isTargetHome) ||
+        (isCurrentExploring && isTargetProject) ||
+        (isCurrentProject && isTargetExploring);
+
       if (!shouldAnimate) {
         return;
       }

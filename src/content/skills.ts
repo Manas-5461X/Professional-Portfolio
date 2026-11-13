@@ -20,6 +20,8 @@ export interface ExploringTopic {
   why: string;
   evidence: string;
   repoUrl?: string;
+  keyStudyQuestions?: string[];
+  relatedTechnologies?: string[];
 }
 
 
@@ -413,23 +415,86 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
 
 
 
+
 export const CURRENTLY_EXPLORING: ExploringTopic[] = [
   {
     topic: 'AI Model Development & Machine Learning',
-    why: 'Exploring how machine learning models are built, trained, evaluated and improved, while developing a deeper understanding of the mathematics and algorithms behind intelligent systems.',
-    evidence: 'Working through ML algorithms, model implementations, experimentation and AI engineering concepts.'
+
+    why:
+      'Exploring how machine learning models are built, trained, evaluated and improved, while developing a deeper understanding of the mathematics and algorithms behind intelligent systems.',
+
+    evidence:
+      'Working through ML algorithms, model implementations, experimentation and AI engineering concepts.',
+
+    keyStudyQuestions: [
+      'How do machine learning algorithms learn patterns from data?',
+      'How do different models handle training, evaluation and generalization?',
+      'What happens mathematically during gradient descent and optimization?',
+      'How can models be improved through feature engineering and hyperparameter tuning?'
+    ],
+
+    relatedTechnologies: [
+      'Python',
+      'NumPy',
+      'Pandas',
+      'Scikit-learn',
+      'PyTorch',
+      'Jupyter'
+    ]
   },
+
   {
     topic: 'Building a Security-Focused SaaS Platform',
-    why: 'Designing a developer-focused security platform that brings code analysis, vulnerability detection, AI-assisted security insights and developer workflows into one product.',
-    evidence: 'Exploring SaaS architecture, security scanning engines, repository analysis, AI integrations and product infrastructure.'
+
+    why:
+      'Designing a developer-focused security platform that brings code analysis, vulnerability detection, AI-assisted security insights and developer workflows into one product.',
+
+    evidence:
+      'Exploring SaaS architecture, security scanning engines, repository analysis, AI integrations and product infrastructure.',
+
+    keyStudyQuestions: [
+      'How can repository security scanning work efficiently at scale?',
+      'How should static analysis and vulnerability detection engines be designed?',
+      'How can authentication, API security and user isolation be handled?',
+      'How can AI assist developers without compromising security or reliability?'
+    ],
+
+    relatedTechnologies: [
+      'React',
+      'TypeScript',
+      'Node.js',
+      'PostgreSQL',
+      'GitHub API',
+      'Docker'
+    ]
   },
+
   {
     topic: 'Open-Source Development & Collaboration',
-    why: 'Learning from real-world codebases, exploring how established projects are engineered, identifying security issues and contributing meaningful improvements to the developer ecosystem.',
-    evidence: 'Reviewing open-source repositories, exploring unfamiliar codebases, testing AI-assisted development tools and building publicly available projects.',
-    repoUrl: 'https://github.com/Manas-5461X'
+
+    why:
+      'Learning from real-world codebases, exploring how established projects are engineered, identifying security issues and contributing meaningful improvements to the developer ecosystem.',
+
+    evidence:
+      'Reviewing open-source repositories, understanding implementation choices, exploring project architecture and building publicly available software.',
+
+    keyStudyQuestions: [
+      'How are large open-source projects structured and maintained?',
+      'How do developers identify, reproduce and fix issues in unfamiliar codebases?',
+      'What makes a contribution useful, maintainable and production-ready?',
+      'How do testing, documentation and code reviews improve software quality?'
+    ],
+
+    relatedTechnologies: [
+      'Git',
+      'GitHub',
+      'TypeScript',
+      'JavaScript',
+      'Python',
+      'GitHub Actions'
+    ]
   }
 ];
+
 
 

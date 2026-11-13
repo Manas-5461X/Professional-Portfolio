@@ -98,18 +98,36 @@ export function Navbar() {
 
         {/* Desktop Navigation Links */}
         <nav aria-label="Primary navigation" className="site-nav-links hidden lg:flex">
-          {NAV_LINKS.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => handleNavClick(item)}
-              className={`btn-tactile ulink text-[13.5px] font-normal ${
-                item.path && location.pathname === item.path ? 'text-[var(--accent)] font-semibold' : ''
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+          {NAV_LINKS.map((item) =>
+            item.path ? (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`btn-tactile ulink text-[13.5px] font-normal ${
+                  location.pathname === item.path ? 'text-[var(--accent)] font-semibold' : ''
+                }`}
+              >
+                {item.label}
+              </Link>
+            ) : location.pathname !== '/' ? (
+              <Link
+                key={item.label}
+                to={`/${item.hash || ''}`}
+                className="btn-tactile ulink text-[13.5px] font-normal"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => handleNavClick(item)}
+                className="btn-tactile ulink text-[13.5px] font-normal"
+              >
+                {item.label}
+              </button>
+            )
+          )}
         </nav>
 
         {/* Action CTAs & Controls */}
@@ -181,20 +199,40 @@ export function Navbar() {
 
           <nav aria-label="Mobile navigation" className="flex flex-col gap-3 my-auto py-8">
             <span className="mono opacity-50 text-xs uppercase tracking-wider mb-2">Navigation</span>
-            {NAV_LINKS.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => handleNavClick(item)}
-                className={`serif text-4xl text-left transition-colors py-1 ${
-                  item.path && location.pathname === item.path
-                    ? 'text-[var(--signal)]'
-                    : 'text-[var(--paper)] hover:text-[var(--signal)]'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {NAV_LINKS.map((item) =>
+              item.path ? (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  onClick={() => setMenuOpen(false)}
+                  className={`serif text-4xl text-left transition-colors py-1 ${
+                    location.pathname === item.path
+                      ? 'text-[var(--signal)]'
+                      : 'text-[var(--paper)] hover:text-[var(--signal)]'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ) : location.pathname !== '/' ? (
+                <Link
+                  key={item.label}
+                  to={`/${item.hash || ''}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="serif text-4xl text-left transition-colors py-1 text-[var(--paper)] hover:text-[var(--signal)]"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => handleNavClick(item)}
+                  className="serif text-4xl text-left transition-colors py-1 text-[var(--paper)] hover:text-[var(--signal)]"
+                >
+                  {item.label}
+                </button>
+              )
+            )}
           </nav>
 
           <div className="border-t border-white/15 pt-6">

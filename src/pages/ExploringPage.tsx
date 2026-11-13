@@ -108,7 +108,7 @@ export function ExploringPage() {
           <div className="mt-8 flex flex-wrap gap-4 border-t border-[var(--line)] pt-6 text-xs font-mono text-[var(--muted)]">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[var(--status-live-fg)]" />
-              <span>4 Active Study Tracks</span>
+              <span>{CURRENTLY_EXPLORING.length} Active Study Tracks</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full border border-[var(--accent)]" />
@@ -196,7 +196,10 @@ export function ExploringPage() {
                         Key Study Questions
                       </h3>
                       <ul className="mt-2 space-y-2 text-xs text-[var(--fg-2)]">
-                        {meta.keyQuestions.map((q, qIdx) => (
+                        {(topic.keyStudyQuestions && topic.keyStudyQuestions.length > 0
+                          ? topic.keyStudyQuestions
+                          : meta.keyQuestions
+                        ).map((q, qIdx) => (
                           <li key={qIdx} className="flex items-start gap-2">
                             <span className="text-[var(--accent)] mt-0.5">•</span>
                             <span>{q}</span>
@@ -210,7 +213,10 @@ export function ExploringPage() {
                         Related Technologies
                       </h3>
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        {meta.stack.map((tech) => (
+                        {(topic.relatedTechnologies && topic.relatedTechnologies.length > 0
+                          ? topic.relatedTechnologies
+                          : meta.stack
+                        ).map((tech) => (
                           <span
                             key={tech}
                             className="rounded border border-[var(--line)] bg-[var(--surface-subtle)] px-2 py-0.5 font-mono text-[11px] text-[var(--fg-2)]"
