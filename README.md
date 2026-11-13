@@ -1,54 +1,94 @@
-# Manas Gandhi: Developer Portfolio
+# Developer Portfolio & Technical Index
 
-Personal portfolio for **Manas Gandhi**, Computer Science undergraduate (2025 to 2029), built around **The Developer's Workspace: Editorial Tech** visual system.
+A modern, high-performance developer portfolio and project showcase built around an editorial typography system, interactive client-side engineering sandboxes, and smooth motion architecture.
 
-## Selected Projects (Verified Case Studies)
+## Overview
 
-1. **DevGuard Pro** (`/projects/devguard-pro`): In-browser security analyzer with Monaco Editor, 34 comment-aware heuristic rules, Gemini fallback loop, and Firebase Auth/Firestore persistence.
-2. **CodeForensics** (`/projects/codeforensics`): TypeScript monorepo (`Fastify 5`, `React 18`, `Prisma`, `PostgreSQL`, `BullMQ`) for AST code archaeology and deterministic PR/issue lineage.
-3. **DPI Engine** (`/projects/dpi-engine`): Zero-dependency Python PCAP Deep Packet Inspection engine with TLS SNI / HTTP Host parsing and multi-process filtering.
-4. **SecScan.io** (`/projects/secscan-io`): Decoupled Express 5 + React 19 GitHub repository scanner for secrets, OSV.dev npm CVEs, and config flaws.
+- **Interactive Engineering Sandboxes**: Live interactive demonstrations for featured projects (AST symbol graph explorer, packet inspector rules, static code security scanner, and container risk calculator).
+- **Responsive Architecture**: Fluid single-screen hero experience on desktop, adaptive touch-optimized layouts on mobile, with zero horizontal overflow.
+- **Editorial Typography & Visual Tone**: Clean serif display headers, monospaced metadata ledgers, and tactile button controls inspired by editorial design systems.
+- **WebGL2 Ink-Bleed Theme Engine**: Custom fluid simulation shader for smooth, organic light/dark mode transitions with instant zero-motion accessibility fallbacks.
+- **Technical Index & Learning Log**: Dual-mode ledger categorizing shipped technologies from areas currently under active study with filterable maturity states.
 
-## Stack
+## Tech Stack
 
-- React 19, TypeScript, Vite 6
-- Tailwind CSS v4 + CSS custom properties (`light` and `dark` themes)
-- React Router v7
-- GSAP + `@gsap/react` + Lenis (`prefers-reduced-motion` compliant)
-- Phosphor Icons (`@phosphor-icons/react`)
-- Vercel serverless contact handler (`api/contact.ts`) with Nodemailer and `mailto:` fallback
+- **Framework**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS v4 + custom CSS design tokens
+- **Routing**: React Router
+- **Animations**: GSAP + `@gsap/react` + Lenis smooth scroll
+- **Icons**: Phosphor Icons (`@phosphor-icons/react`)
+- **Visuals & Shaders**: Three.js / WebGL2 fragment shaders
 
-## Local Development
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/Manas-5461X/Professional-Portfolio.git
+cd Professional-Portfolio
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
 ```
 
-## Typecheck & Production Build
+The application will be running at `http://127.0.0.1:5173`.
+
+## Available Scripts
+
+| Command | Description |
+| :--- | :--- |
+| `npm run dev` | Starts Vite local development server with HMR |
+| `npm run build` | Runs TypeScript typecheck (`tsc -b`) and produces production bundle in `dist/` |
+| `npm run preview` | Previews production build locally |
+
+## Environment Configuration
+
+Copy `.env.example` to `.env` to configure optional canonical metadata and contact form transport:
 
 ```bash
-npm run typecheck
-npm run build
-npm run preview
+cp .env.example .env
 ```
-
-## Environment Variables
-
-Copy `.env.example` to `.env` if configuring production canonical metadata or SMTP email transport:
 
 ```env
-VITE_SITE_URL=
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-CONTACT_TO=manas.devx@gmail.com
-```
+# Production URL for canonical tags and Open Graph metadata
+VITE_SITE_URL=https://your-portfolio.pages.dev
 
-If SMTP variables are left unset, the contact form cleanly surfaces a pre-filled `mailto:manas.devx@gmail.com` fallback rather than faking delivery.
+# Optional Contact Form SMTP credentials
+# If left unset, the contact form cleanly falls back to a pre-filled client mailto: link
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-16-character-app-password
+CONTACT_TO=your-email@gmail.com
+```
 
 ## Deployment
 
-- **Vercel**: Uses `vercel.json` SPA rewrite (`cleanUrls: true`) and routes `/api/contact` to `api/contact.ts`.
-- **Netlify / Static Hosts**: Uses `public/_redirects` (`/* /index.html 200`) for deep client routes (`/projects/:slug`, `/404`).
+### Cloudflare Pages (Recommended)
+This repository includes [`public/_redirects`](./public/_redirects) for SPA client-side routing on Cloudflare Pages:
+1. Connect your GitHub repository to Cloudflare Pages.
+2. Build command: `npm run build`
+3. Build output directory: `dist`
+4. Set optional environment variable: `VITE_SITE_URL=https://your-domain.pages.dev`
+
+### Vercel
+Uses [`vercel.json`](./vercel.json) to configure SPA routing rewrites and serverless contact API handling:
+```bash
+npx vercel
+```
+
+### Static Hosts (Netlify, GitHub Pages, S3)
+The build produces standard static assets in `dist/`. Ensure deep route fallbacks redirect to `/index.html`.
+
+## License
+
+MIT

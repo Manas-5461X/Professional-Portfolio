@@ -279,13 +279,14 @@ export function Footer() {
             </span>
           </a>
 
-          <a
+          {/* Resume download hidden for now as requested */}
+          {/* <a
             href="/resume.pdf"
             download
             className="pill solid light"
           >
             <span className="dot" /> Download resume (PDF)
-          </a>
+          </a> */}
 
           <a
             href={`mailto:${PROFILE.email}`}

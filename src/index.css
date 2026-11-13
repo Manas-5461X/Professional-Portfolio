@@ -364,6 +364,58 @@
   margin-top: clamp(1rem, 2vw, 2rem);
 }
 
+@media (max-width: 768px) {
+  .hero {
+    min-height: 100svh;
+    height: auto;
+    max-height: none;
+    padding: clamp(4.5rem, 10vh, 5.5rem) var(--gutter) clamp(1.5rem, 3vh, 2.25rem);
+  }
+
+  .hero-name {
+    margin: 1.25rem 0;
+    line-height: 0.92;
+  }
+
+  .hero-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .hero-foot .lede {
+    max-width: 100%;
+    font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+    line-height: 1.55;
+  }
+
+  .hero-foot .hero-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .hero-foot .hero-actions .pill {
+    padding: 0.65rem 1.15rem;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-foot .hero-actions {
+    gap: 0.5rem;
+  }
+  .hero-foot .hero-actions .pill {
+    padding: 0.55rem 0.95rem;
+    font-size: 12px;
+  }
+}
+
 /* Word masking for GSAP entrance reveals */
 .mask-line {
   display: block;

@@ -37,7 +37,7 @@ export function HeroSection() {
           {PROFILE.heroPositioning} {PROFILE.heroSubheadline}
         </p>
 
-        <div data-hero-fade className="flex flex-wrap items-center gap-2.5">
+        <div data-hero-fade className="hero-actions flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             onClick={() => scrollToElement('#projects')}
@@ -46,9 +46,10 @@ export function HeroSection() {
             <span className="dot" /> See the flagships
           </button>
 
-          <a href="/resume.pdf" download className="pill">
+          {/* Resume download hidden for now as requested */}
+          {/* <a href="/resume.pdf" download className="pill">
             Resume <span className="arrow">&darr;</span>
-          </a>
+          </a> */}
 
           <a
             href={PROFILE.linkedin}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { List, Moon, Sun, X } from '@phosphor-icons/react';
+import { DotsThreeVertical, Moon, Sun, X } from '@phosphor-icons/react';
 import { useTheme } from '../hooks/useTheme';
 import { PROFILE } from '../content/profile';
 import { scrollToElement, scrollToTopImmediate, stopScroll, startScroll } from '../lib/smooth';
@@ -117,16 +117,17 @@ export function Navbar() {
             </span>
           </button>
 
-          {/* Mobile Drawer Button */}
+          {/* Mobile 3-Dots Drawer Button */}
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-expanded={menuOpen}
             aria-controls="mobile-navigation-drawer"
-            className="btn-tactile inline-flex min-h-[40px] items-center gap-2 rounded-md border border-current px-3 text-sm font-medium lg:hidden"
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            title={menuOpen ? 'Close menu' : 'Open menu'}
+            className="btn-tactile inline-flex h-[36px] w-[36px] min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-current text-inherit opacity-85 hover:opacity-100 transition-opacity lg:hidden"
           >
-            {menuOpen ? <X size={18} weight="regular" /> : <List size={18} weight="regular" />}
-            <span>{menuOpen ? 'Close' : 'Menu'}</span>
+            {menuOpen ? <X size={20} weight="bold" /> : <DotsThreeVertical size={24} weight="bold" />}
           </button>
         </div>
       </header>
@@ -138,21 +139,35 @@ export function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
-          className="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto bg-[var(--ink)] text-[var(--paper)] px-6 py-12 lg:hidden"
+          className="fixed inset-0 z-[200] flex flex-col justify-between overflow-y-auto bg-[var(--ink)] text-[var(--paper)] px-6 py-6 lg:hidden"
         >
-          <div className="flex justify-between items-center pb-6 border-b border-white/15">
-            <span className="serif text-2xl italic">{PROFILE.name}</span>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              className="mono text-xs uppercase tracking-wider text-[var(--paper)]"
-            >
-              Close
-            </button>
+          {/* Clean single top bar replacing underlying header */}
+          <div className="flex justify-between items-center pb-5 border-b border-white/15">
+            <span className="serif text-2xl italic tracking-tight">{PROFILE.name}</span>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                className="btn-tactile inline-flex h-[36px] w-[36px] min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-white/40 text-[var(--paper)] opacity-85 hover:opacity-100 transition-opacity"
+              >
+                <Sun size={15} weight="regular" className="theme-icon-sun" aria-hidden="true" />
+                <Moon size={15} weight="regular" className="theme-icon-moon" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close navigation menu"
+                className="btn-tactile inline-flex h-[36px] w-[36px] min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-white/40 text-[var(--paper)] opacity-85 hover:opacity-100 transition-opacity"
+              >
+                <X size={20} weight="bold" />
+              </button>
+            </div>
           </div>
 
-          <nav aria-label="Mobile navigation" className="flex flex-col gap-2 my-auto">
-            <span className="mono opacity-50 text-xs mb-2">Navigation</span>
+          <nav aria-label="Mobile navigation" className="flex flex-col gap-3 my-auto py-8">
+            <span className="mono opacity-50 text-xs uppercase tracking-wider mb-2">Navigation</span>
             {NAV_LINKS.map((item) => (
               <button
                 key={item.hash}
@@ -167,9 +182,10 @@ export function Navbar() {
 
           <div className="border-t border-white/15 pt-6">
             <div className="flex flex-wrap items-center gap-4">
-              <a href="/resume.pdf" download className="pill solid light">
+              {/* Resume download hidden for now as requested */}
+              {/* <a href="/resume.pdf" download className="pill solid light">
                 <span className="dot" /> Resume &darr;
-              </a>
+              </a> */}
               <a
                 href={PROFILE.linkedin}
                 target="_blank"
