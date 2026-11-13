@@ -32,6 +32,9 @@ function lazyWithRetry<T extends { default: React.ComponentType<any> }>(
 const ProjectCaseStudyPage = lazyWithRetry(() =>
   import('./pages/ProjectCaseStudyPage').then((m) => ({ default: m.ProjectCaseStudyPage }))
 );
+const ExploringPage = lazyWithRetry(() =>
+  import('./pages/ExploringPage').then((m) => ({ default: m.ExploringPage }))
+);
 const NotFoundPage = lazyWithRetry(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
@@ -58,6 +61,7 @@ export function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/projects/:slug" element={<ProjectCaseStudyPage />} />
+                <Route path="/exploring" element={<ExploringPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

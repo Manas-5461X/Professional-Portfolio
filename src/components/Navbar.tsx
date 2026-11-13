@@ -5,13 +5,19 @@ import { useTheme } from '../hooks/useTheme';
 import { PROFILE } from '../content/profile';
 import { scrollToElement, scrollToTopImmediate, stopScroll, startScroll } from '../lib/smooth';
 
-const NAV_LINKS = [
+interface NavItem {
+  label: string;
+  hash?: string;
+  path?: string;
+}
+
+const NAV_LINKS: NavItem[] = [
   { label: 'About', hash: '#about' },
   { label: 'Projects', hash: '#projects' },
   { label: 'Index', hash: '#skills' },
-  { label: 'Exploring', hash: '#exploring' },
+  { label: 'Exploring', path: '/exploring' },
   { label: 'Contact', hash: '#contact' }
-] as const;
+];
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -42,8 +48,13 @@ export function Navbar() {
     };
   }, [menuOpen]);
 
-  const handleSectionClick = (hash: string) => {
+  const handleNavClick = (item: NavItem) => {
     setMenuOpen(false);
+    if (item.path) {
+      navigate(item.path);
+      return;
+    }
+    const hash = item.hash || '';
     if (hash === '#top') {
       if (location.pathname === '/') {
         scrollToTopImmediate();
@@ -89,10 +100,12 @@ export function Navbar() {
         <nav aria-label="Primary navigation" className="site-nav-links hidden lg:flex">
           {NAV_LINKS.map((item) => (
             <button
-              key={item.hash}
+              key={item.label}
               type="button"
-              onClick={() => handleSectionClick(item.hash)}
-              className="btn-tactile ulink text-[13.5px] font-normal"
+              onClick={() => handleNavClick(item)}
+              className={`btn-tactile ulink text-[13.5px] font-normal ${
+                item.path && location.pathname === item.path ? 'text-[var(--accent)] font-semibold' : ''
+              }`}
             >
               {item.label}
             </button>
@@ -170,10 +183,14 @@ export function Navbar() {
             <span className="mono opacity-50 text-xs uppercase tracking-wider mb-2">Navigation</span>
             {NAV_LINKS.map((item) => (
               <button
-                key={item.hash}
+                key={item.label}
                 type="button"
-                onClick={() => handleSectionClick(item.hash)}
-                className="serif text-4xl text-left text-[var(--paper)] hover:text-[var(--signal)] transition-colors py-1"
+                onClick={() => handleNavClick(item)}
+                className={`serif text-4xl text-left transition-colors py-1 ${
+                  item.path && location.pathname === item.path
+                    ? 'text-[var(--signal)]'
+                    : 'text-[var(--paper)] hover:text-[var(--signal)]'
+                }`}
               >
                 {item.label}
               </button>
