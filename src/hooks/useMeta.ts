@@ -17,7 +17,7 @@ function setMetaTag(selector: string, attrName: string, attrVal: string, content
   el.setAttribute('content', content);
 }
 
-export function useMeta({ title, description, path = '/', image = '/og-image.png' }: MetaOptions): void {
+export function useMeta({ title, description, path = '/', image = '/og-image.png?v=2' }: MetaOptions): void {
   useEffect(() => {
     document.title = title;
     setMetaTag('meta[name="description"]', 'name', 'description', description);
