@@ -4,6 +4,7 @@ interface MetaOptions {
   title: string;
   description: string;
   path?: string;
+  image?: string;
 }
 
 function setMetaTag(selector: string, attrName: string, attrVal: string, content: string): void {
@@ -16,7 +17,7 @@ function setMetaTag(selector: string, attrName: string, attrVal: string, content
   el.setAttribute('content', content);
 }
 
-export function useMeta({ title, description, path = '/' }: MetaOptions): void {
+export function useMeta({ title, description, path = '/', image = '/og-image.png' }: MetaOptions): void {
   useEffect(() => {
     document.title = title;
     setMetaTag('meta[name="description"]', 'name', 'description', description);
@@ -40,7 +41,14 @@ export function useMeta({ title, description, path = '/' }: MetaOptions): void {
       }
       canonical.href = canonicalHref;
       setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalHref);
+
+      const absoluteImageUrl = image.startsWith('http')
+        ? image
+        : `${normalizedBase}${image.startsWith('/') ? image : `/${image}`}`;
+      setMetaTag('meta[property="og:image"]', 'property', 'og:image', absoluteImageUrl);
+      setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', absoluteImageUrl);
+      setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', absoluteImageUrl);
     }
-  }, [title, description, path]);
+  }, [title, description, path, image]);
 }
 
