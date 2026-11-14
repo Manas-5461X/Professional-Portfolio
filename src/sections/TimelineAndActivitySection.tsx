@@ -35,7 +35,7 @@ function ContributionMatrix({
   const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
 
   return (
-    <div data-github-matrix className="mt-6">
+    <div data-github-matrix className="mt-6 hidden md:block">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
         <span className="font-mono text-[var(--muted)]">
           53-Week Contribution Matrix · Longest streak: {activity.longestStreak.length} days · Peak day:{' '}
