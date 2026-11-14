@@ -29,6 +29,7 @@ export interface CardSwapItem {
 export interface CardSwapHandle {
   next: () => void;
   prev: () => void;
+  goTo: (index: number) => void;
 }
 
 export interface CardSwapProps {
@@ -165,6 +166,7 @@ interface ShiftOptions {
 interface SwapApi {
   next: () => void;
   prev: () => void;
+  goTo: (index: number) => void;
   refresh: () => void;
 }
 
@@ -376,7 +378,8 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(
       ref,
       () => ({
         next: () => apiRef.current?.next(),
-        prev: () => apiRef.current?.prev()
+        prev: () => apiRef.current?.prev(),
+        goTo: (index: number) => apiRef.current?.goTo(index)
       }),
       []
     );
@@ -822,6 +825,7 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(
         settingsRef.current.onCardClick?.(index);
         const position = state.order.indexOf(index);
         if (position > 0) goTo(position);
+        else if (position === 0) shift(1);
       };
 
       const onVisibility = () => schedule();
@@ -829,6 +833,10 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(
       apiRef.current = {
         next: () => shift(1),
         prev: () => shift(-1),
+        goTo: (targetIndex: number) => {
+          const position = state.order.indexOf(targetIndex);
+          if (position > 0) goTo(position);
+        },
         refresh: () => {
           const s = settingsRef.current;
           deck.forEach(card => {

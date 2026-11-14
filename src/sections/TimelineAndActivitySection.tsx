@@ -382,7 +382,9 @@ export function TimelineAndActivitySection() {
                   verticalDistance={14}
                   skewAmount={3}
                   visibleCards={3}
-                  delay={4500}
+                  speed={1.75}
+                  bounce={0.12}
+                  delay={3200}
                   autoplay={true}
                   pauseOnHover={true}
                   draggable={true}
@@ -430,16 +432,9 @@ export function TimelineAndActivitySection() {
                   <button
                     key={dotIdx}
                     type="button"
-                    onClick={() => {
-                      const diff = dotIdx - activeMilestoneIndex;
-                      if (diff > 0) {
-                        for (let i = 0; i < diff; i++) swapRef.current?.next();
-                      } else if (diff < 0) {
-                        for (let i = 0; i < Math.abs(diff); i++) swapRef.current?.prev();
-                      }
-                    }}
+                    onClick={() => swapRef.current?.goTo(dotIdx)}
                     aria-label={`Jump to milestone ${dotIdx + 1}`}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                    className={`h-1.5 rounded-full transition-all duration-200 ${
                       dotIdx === activeMilestoneIndex
                         ? 'w-6 bg-[var(--accent)]'
                         : 'w-1.5 bg-[var(--line-strong)] hover:bg-[var(--muted)]'
