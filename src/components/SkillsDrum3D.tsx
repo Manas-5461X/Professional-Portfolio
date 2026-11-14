@@ -102,8 +102,8 @@ export function SkillsDrum3D({
 
   // Pointer drag/swipe gesture support
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Don't hijack if user clicked an interactive link or button inside the card
-    if ((e.target as HTMLElement).closest('a, button, [role="button"]')) return;
+    // Don't hijack if user clicked an interactive link or button inside the card or scroll area
+    if ((e.target as HTMLElement).closest('a, button, [role="button"], [data-lenis-prevent]')) return;
     isDraggingRef.current = true;
     startXRef.current = e.clientX;
     deltaXRef.current = 0;
@@ -211,7 +211,7 @@ export function SkillsDrum3D({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        className="relative h-[540px] w-full overflow-hidden select-none [perspective:1400px] cursor-grab active:cursor-grabbing"
+        className="relative h-[560px] w-full overflow-hidden select-none [perspective:1400px] cursor-grab active:cursor-grabbing"
         style={{
           maskImage:
             'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
@@ -282,7 +282,7 @@ export function SkillsDrum3D({
                 onClick={() => {
                   if (!isCenter) setActiveIndex(idx);
                 }}
-                className={`absolute left-1/2 top-1/2 w-full max-w-2xl h-[420px] rounded-2xl border transition-all duration-500 ease-out ${
+                className={`absolute left-1/2 top-1/2 w-full max-w-2xl h-[450px] rounded-2xl border transition-all duration-500 ease-out ${
                   isCenter
                     ? 'border-[var(--line-strong)] bg-[#FAF8F5] dark:bg-[var(--surface-elevated,var(--surface))] shadow-[0_20px_48px_-16px_rgba(60,45,30,0.08)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)] ring-1 ring-[var(--line)]'
                     : 'border-[var(--line)] bg-[#EFECE4] dark:bg-[var(--surface-subtle)] cursor-pointer hover:border-[var(--accent)] hover:opacity-70'
@@ -354,7 +354,13 @@ export function SkillsDrum3D({
 
                   {/* Evidence & Case Study Proof Ledger */}
                   {isCenter && visibleItems.length > 0 && (
-                    <div className="mt-4 flex-1 overflow-y-auto pr-1 border-t border-[var(--line)] pt-3 scrollbar-thin">
+                    <div
+                      data-lenis-prevent="true"
+                      onWheel={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className="mt-4 flex-1 overflow-y-auto pr-1.5 border-t border-[var(--line)] pt-3 scrollbar-thin overscroll-contain"
+                    >
                       <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--muted)] mb-2">
                         Verifiable Evidence Ledger
                       </span>
