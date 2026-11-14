@@ -13,6 +13,7 @@ dist/
 # Build caches & telemetry
 *.tsbuildinfo
 .eslintcache
+.firebase/
 
 # Logs
 *.log
