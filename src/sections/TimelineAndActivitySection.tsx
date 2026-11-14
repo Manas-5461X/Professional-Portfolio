@@ -24,6 +24,228 @@ function getCellClass(count: number): string {
   return 'bg-[#0369A1] dark:bg-[#38BDF8] border-[#075985] dark:border-sky-300';
 }
 
+function ContributionMatrix({
+  activity,
+  getCellClass
+}: {
+  activity: GitHubActivityData;
+  getCellClass: (count: number) => string;
+}) {
+  const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
+
+  return (
+    <div data-github-matrix className="mt-6">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <span className="font-mono text-[var(--muted)]">
+          53-Week Contribution Matrix · Longest streak: {activity.longestStreak.length} days · Peak day:{' '}
+          {activity.bestDay.count} on {activity.bestDay.date}
+        </span>
+        <span className="font-mono text-[var(--accent)]" aria-live="polite">
+          {hoveredDay ? `${hoveredDay.date}: ${hoveredDay.count} contributions` : 'Hover or focus a day cell'}
+        </span>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
+        <div
+          className="inline-grid grid-flow-col gap-1"
+          role="img"
+          aria-label={`GitHub contribution calendar showing ${activity.totalContributions} contributions across ${activity.activeDays} active days`}
+        >
+          {activity.weeks.map((week, wIdx) => (
+            <div key={wIdx} className="grid grid-rows-7 gap-1">
+              {week.map((day) => (
+                <button
+                  key={day.date}
+                  type="button"
+                  onMouseEnter={() => setHoveredDay(day)}
+                  onFocus={() => setHoveredDay(day)}
+                  onBlur={() => setHoveredDay(null)}
+                  aria-label={`${day.date}: ${day.count} contributions`}
+                  className={`h-3 w-3 rounded-[2px] border transition-transform hover:scale-125 ${getCellClass(
+                    day.count
+                  )}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CommitVelocityVisualizer({
+  velocity30,
+  totalVelocity30,
+  peakDay30,
+  maxVelocity30
+}: {
+  velocity30: ContributionDay[];
+  totalVelocity30: number;
+  peakDay30: { date: string; count: number };
+  maxVelocity30: number;
+}) {
+  const [hoveredVelocityDay, setHoveredVelocityDay] = useState<ContributionDay | null>(null);
+
+  return (
+    <div className="lg:col-span-6 rounded-xl border border-cyan-500/25 bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between shadow-[0_0_30px_-15px_rgba(6,182,212,0.2)]">
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-cyan-400">
+              Commit Velocity (30 Days)
+            </span>
+          </div>
+          <span className="font-mono text-[11px] text-[var(--muted)] tabular-nums">
+            {totalVelocity30} commits
+          </span>
+        </div>
+
+        <div className="mt-1 flex items-center justify-between text-[11px] font-mono">
+          <span className="text-[var(--muted)]">
+            Peak: <span className="text-cyan-300 font-medium">{peakDay30.count}</span> on {peakDay30.date}
+          </span>
+          <span className="text-cyan-400 font-medium" aria-live="polite">
+            {hoveredVelocityDay
+              ? `${hoveredVelocityDay.date}: ${hoveredVelocityDay.count} commits`
+              : 'Hover a day bar'}
+          </span>
+        </div>
+      </div>
+
+      {/* Equalizer Visualizer */}
+      <div className="mt-6 pt-4 border-t border-[var(--line)]">
+        <div className="relative h-28 w-full flex items-end justify-between gap-1 sm:gap-1.5 px-1 pb-1 border-b border-cyan-500/30">
+          <div className="absolute inset-0 pointer-events-none flex flex-col justify-between opacity-15">
+            <div className="border-b border-cyan-400 border-dashed w-full" />
+            <div className="border-b border-cyan-400 border-dashed w-full" />
+            <div className="border-b border-cyan-400 border-dashed w-full" />
+          </div>
+
+          {velocity30.map((d) => {
+            const heightPercent = Math.max(8, Math.round((d.count / maxVelocity30) * 100));
+            const isHovered = hoveredVelocityDay?.date === d.date;
+            return (
+              <button
+                key={d.date}
+                type="button"
+                onMouseEnter={() => setHoveredVelocityDay(d)}
+                onFocus={() => setHoveredVelocityDay(d)}
+                onMouseLeave={() => setHoveredVelocityDay(null)}
+                onBlur={() => setHoveredVelocityDay(null)}
+                aria-label={`${d.date}: ${d.count} commits`}
+                className={`flex-1 rounded-t-[3px] transition-all duration-200 relative group cursor-pointer ${
+                  isHovered
+                    ? 'bg-white shadow-[0_0_12px_#38bdf8] scale-y-105'
+                    : d.count > 0
+                    ? 'bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_6px_rgba(56,189,248,0.5)] hover:shadow-[0_0_10px_#38bdf8]'
+                    : 'bg-cyan-950/40 hover:bg-cyan-800/50'
+                }`}
+                style={{ height: `${heightPercent}%` }}
+              />
+            );
+          })}
+        </div>
+        <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-[var(--muted)] px-1">
+          <span>30 days ago</span>
+          <span>Today</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StackDistributionVisualizer({
+  stack,
+  publicRepos
+}: {
+  stack: LanguageShare[];
+  publicRepos: number;
+}) {
+  const [hoveredLang, setHoveredLang] = useState<string | null>(null);
+
+  return (
+    <div className="lg:col-span-6 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between">
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Database size={15} className="text-yellow-400" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-yellow-400">
+              Stack Distribution (Live Repos)
+            </span>
+          </div>
+          <span className="font-mono text-[11px] text-[var(--muted)]">
+            {publicRepos} Repositories
+          </span>
+        </div>
+        <p className="mt-1 text-[11px] font-mono text-[var(--muted)]">
+          Primary language share extracted directly from public source code.
+        </p>
+      </div>
+
+      {/* Segmented Progress Bar */}
+      <div className="mt-6">
+        <div className="h-3.5 w-full rounded-full bg-[var(--surface-subtle)] overflow-hidden flex border border-[var(--line)] p-0.5 gap-0.5 shadow-inner">
+          {stack.map((item, idx) => (
+            <div
+              key={item.name}
+              onMouseEnter={() => setHoveredLang(item.name)}
+              onMouseLeave={() => setHoveredLang(null)}
+              style={{
+                width: `${item.percent}%`,
+                backgroundColor: item.color,
+                boxShadow: hoveredLang === item.name ? `0 0 10px ${item.color}` : 'none'
+              }}
+              className={`h-full transition-all duration-200 cursor-pointer ${
+                idx === 0 ? 'rounded-l-full' : ''
+              } ${idx === stack.length - 1 ? 'rounded-r-full' : ''}`}
+              title={`${item.name}: ${item.percent}% (${item.count} repos)`}
+            />
+          ))}
+        </div>
+
+        {/* 2-Column Languages Legend */}
+        <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-mono">
+          {stack.slice(0, 8).map((item) => {
+            const isHovered = hoveredLang === item.name;
+            return (
+              <div
+                key={item.name}
+                onMouseEnter={() => setHoveredLang(item.name)}
+                onMouseLeave={() => setHoveredLang(null)}
+                className={`flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${
+                  isHovered ? 'bg-[var(--surface-subtle)]' : ''
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span
+                    className="h-2 w-2 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: item.color,
+                      boxShadow: `0 0 6px ${item.color}`
+                    }}
+                  />
+                  <span
+                    className={`truncate text-xs ${
+                      isHovered ? 'text-[var(--accent)] font-medium' : 'text-[var(--fg)]'
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                </div>
+                <span className="font-mono text-xs text-[var(--muted)] font-semibold tabular-nums ml-2">
+                  {item.percent}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TimelineAndActivitySection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const timelineListRef = useRef<HTMLOListElement | null>(null);
@@ -32,10 +254,7 @@ export function TimelineAndActivitySection() {
 
   const [activity, setActivity] = useState<GitHubActivityData>(GITHUB_ACTIVITY);
   const [isLive, setIsLive] = useState(false);
-  const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
   const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
-  const [hoveredVelocityDay, setHoveredVelocityDay] = useState<ContributionDay | null>(null);
-  const [hoveredLang, setHoveredLang] = useState<string | null>(null);
   const [leetcode, setLeetcode] = useState<LeetCodeData>(LEETCODE_BASELINE);
   const swapRef = useRef<CardSwapHandle | null>(null);
 
@@ -575,192 +794,24 @@ export function TimelineAndActivitySection() {
             ))}
           </dl>
 
-          <div data-github-matrix className="mt-6">
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="font-mono text-[var(--muted)]">
-                53-Week Contribution Matrix · Longest streak: {activity.longestStreak.length} days · Peak day:{' '}
-                {activity.bestDay.count} on {activity.bestDay.date}
-              </span>
-              <span className="font-mono text-[var(--accent)]" aria-live="polite">
-                {hoveredDay ? `${hoveredDay.date}: ${hoveredDay.count} contributions` : 'Hover or focus a day cell'}
-              </span>
-            </div>
-
-            <div className="overflow-x-auto rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
-              <div
-                className="inline-grid grid-flow-col gap-1"
-                role="img"
-                aria-label={`GitHub contribution calendar showing ${activity.totalContributions} contributions across ${activity.activeDays} active days`}
-              >
-                {activity.weeks.map((week, wIdx) => (
-                  <div key={wIdx} className="grid grid-rows-7 gap-1">
-                    {week.map((day) => (
-                      <button
-                        key={day.date}
-                        type="button"
-                        onMouseEnter={() => setHoveredDay(day)}
-                        onFocus={() => setHoveredDay(day)}
-                        onBlur={() => setHoveredDay(null)}
-                        aria-label={`${day.date}: ${day.count} contributions`}
-                        className={`h-3 w-3 rounded-[2px] border transition-transform hover:scale-125 ${getCellClass(
-                          day.count
-                        )}`}
-                      />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* Isolated Contribution Matrix */}
+          <ContributionMatrix activity={activity} getCellClass={getCellClass} />
 
           {/* Live Telemetry Modules: Commit Velocity, Stack Distribution, and LeetCode */}
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Module 1: Commit Velocity (30 Days) - Cyan equalizer */}
-            <div className="lg:col-span-6 rounded-xl border border-cyan-500/25 bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between shadow-[0_0_30px_-15px_rgba(6,182,212,0.2)]">
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
-                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-cyan-400">
-                      Commit Velocity (30 Days)
-                    </span>
-                  </div>
-                  <span className="font-mono text-[11px] text-[var(--muted)] tabular-nums">
-                    {totalVelocity30} commits
-                  </span>
-                </div>
-
-                <div className="mt-1 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-[var(--muted)]">
-                    Peak: <span className="text-cyan-300 font-medium">{peakDay30.count}</span> on {peakDay30.date}
-                  </span>
-                  <span className="text-cyan-400 font-medium" aria-live="polite">
-                    {hoveredVelocityDay
-                      ? `${hoveredVelocityDay.date}: ${hoveredVelocityDay.count} commits`
-                      : 'Hover a day bar'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Equalizer Visualizer */}
-              <div className="mt-6 pt-4 border-t border-[var(--line)]">
-                <div className="relative h-28 w-full flex items-end justify-between gap-1 sm:gap-1.5 px-1 pb-1 border-b border-cyan-500/30">
-                  {/* Faint horizontal baseline gridlines */}
-                  <div className="absolute inset-0 pointer-events-none flex flex-col justify-between opacity-15">
-                    <div className="border-b border-cyan-400 border-dashed w-full" />
-                    <div className="border-b border-cyan-400 border-dashed w-full" />
-                    <div className="border-b border-cyan-400 border-dashed w-full" />
-                  </div>
-
-                  {velocity30.map((d) => {
-                    const heightPercent = Math.max(8, Math.round((d.count / maxVelocity30) * 100));
-                    const isHovered = hoveredVelocityDay?.date === d.date;
-                    return (
-                      <button
-                        key={d.date}
-                        type="button"
-                        onMouseEnter={() => setHoveredVelocityDay(d)}
-                        onFocus={() => setHoveredVelocityDay(d)}
-                        onMouseLeave={() => setHoveredVelocityDay(null)}
-                        onBlur={() => setHoveredVelocityDay(null)}
-                        aria-label={`${d.date}: ${d.count} commits`}
-                        className={`flex-1 rounded-t-[3px] transition-all duration-200 relative group cursor-pointer ${
-                          isHovered
-                            ? 'bg-white shadow-[0_0_12px_#38bdf8] scale-y-105'
-                            : d.count > 0
-                            ? 'bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_6px_rgba(56,189,248,0.5)] hover:shadow-[0_0_10px_#38bdf8]'
-                            : 'bg-cyan-950/40 hover:bg-cyan-800/50'
-                        }`}
-                        style={{ height: `${heightPercent}%` }}
-                      />
-                    );
-                  })}
-                </div>
-                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-[var(--muted)] px-1">
-                  <span>30 days ago</span>
-                  <span>Today</span>
-                </div>
-              </div>
-            </div>
+            <CommitVelocityVisualizer
+              velocity30={velocity30}
+              totalVelocity30={totalVelocity30}
+              peakDay30={peakDay30}
+              maxVelocity30={maxVelocity30}
+            />
 
             {/* Module 2: Stack Distribution (Live Repos) - Segmented Multi-Color */}
-            <div className="lg:col-span-6 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Database size={15} className="text-yellow-400" />
-                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-yellow-400">
-                      Stack Distribution (Live Repos)
-                    </span>
-                  </div>
-                  <span className="font-mono text-[11px] text-[var(--muted)]">
-                    {activity.publicRepos} Repositories
-                  </span>
-                </div>
-                <p className="mt-1 text-[11px] font-mono text-[var(--muted)]">
-                  Primary language share extracted directly from public source code.
-                </p>
-              </div>
-
-              {/* Segmented Progress Bar */}
-              <div className="mt-6">
-                <div className="h-3.5 w-full rounded-full bg-[var(--surface-subtle)] overflow-hidden flex border border-[var(--line)] p-0.5 gap-0.5 shadow-inner">
-                  {stack.map((item, idx) => (
-                    <div
-                      key={item.name}
-                      onMouseEnter={() => setHoveredLang(item.name)}
-                      onMouseLeave={() => setHoveredLang(null)}
-                      style={{
-                        width: `${item.percent}%`,
-                        backgroundColor: item.color,
-                        boxShadow: hoveredLang === item.name ? `0 0 10px ${item.color}` : 'none'
-                      }}
-                      className={`h-full transition-all duration-200 cursor-pointer ${
-                        idx === 0 ? 'rounded-l-full' : ''
-                      } ${idx === stack.length - 1 ? 'rounded-r-full' : ''}`}
-                      title={`${item.name}: ${item.percent}% (${item.count} repos)`}
-                    />
-                  ))}
-                </div>
-
-                {/* 2-Column Languages Legend */}
-                <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-mono">
-                  {stack.slice(0, 8).map((item) => {
-                    const isHovered = hoveredLang === item.name;
-                    return (
-                      <div
-                        key={item.name}
-                        onMouseEnter={() => setHoveredLang(item.name)}
-                        onMouseLeave={() => setHoveredLang(null)}
-                        className={`flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${
-                          isHovered ? 'bg-[var(--surface-subtle)]' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className="h-2 w-2 rounded-full shrink-0"
-                            style={{
-                              backgroundColor: item.color,
-                              boxShadow: `0 0 6px ${item.color}`
-                            }}
-                          />
-                          <span
-                            className={`truncate text-xs ${
-                              isHovered ? 'text-[var(--accent)] font-medium' : 'text-[var(--fg)]'
-                            }`}
-                          >
-                            {item.name}
-                          </span>
-                        </div>
-                        <span className="font-mono text-xs text-[var(--muted)] font-semibold tabular-nums ml-2">
-                          {item.percent}%
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <StackDistributionVisualizer
+              stack={stack}
+              publicRepos={activity.publicRepos}
+            />
 
             {/* Module 3: LeetCode Problem Solving Telemetry */}
             <div className="lg:col-span-12 rounded-xl border border-amber-500/20 bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-[0_0_24px_-12px_rgba(245,158,11,0.12)]">

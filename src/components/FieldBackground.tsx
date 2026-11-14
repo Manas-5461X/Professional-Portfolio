@@ -95,7 +95,7 @@ export function FieldBackground() {
       renderer = new WebGLRenderer({
         antialias: false,
         alpha: true,
-        preserveDrawingBuffer: true,
+        preserveDrawingBuffer: false,
         powerPreference: 'high-performance'
       });
     } catch {
@@ -130,10 +130,11 @@ export function FieldBackground() {
     const mesh = new Mesh(new PlaneGeometry(2, 2), material);
     scene.add(mesh);
 
+    let cachedRect = el.getBoundingClientRect();
     const resize = () => {
-      const rect = el.getBoundingClientRect();
-      const w = Math.max(1, rect.width);
-      const h = Math.max(1, rect.height);
+      cachedRect = el.getBoundingClientRect();
+      const w = Math.max(1, cachedRect.width);
+      const h = Math.max(1, cachedRect.height);
       renderer.setSize(w, h, false);
       uniforms.uRes.value.set(w, h);
     };
@@ -143,9 +144,8 @@ export function FieldBackground() {
 
     const target = new Vector2(0.7, 0.6);
     const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        target.set((e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height);
+      if (cachedRect.width > 0 && cachedRect.height > 0) {
+        target.set((e.clientX - cachedRect.left) / cachedRect.width, 1 - (e.clientY - cachedRect.top) / cachedRect.height);
       }
     };
     window.addEventListener('pointermove', onMove, { passive: true });
