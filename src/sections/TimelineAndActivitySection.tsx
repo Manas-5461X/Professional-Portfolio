@@ -13,6 +13,7 @@ import { LEETCODE_BASELINE, type LeetCodeData } from '../content/leetcode';
 import { PROFILE, TIMELINE, VERIFIED_MILESTONES } from '../content/profile';
 import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
 import { CardSwap, Card, type CardSwapHandle } from '../components/CardSwap';
+import { useTheme } from '../hooks/useTheme';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -256,6 +257,7 @@ export function TimelineAndActivitySection() {
   const [isLive, setIsLive] = useState(false);
   const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
   const [leetcode, setLeetcode] = useState<LeetCodeData>(LEETCODE_BASELINE);
+  const { theme } = useTheme();
   const swapRef = useRef<CardSwapHandle | null>(null);
 
   useEffect(() => {
@@ -638,7 +640,7 @@ export function TimelineAndActivitySection() {
                   <span className="font-mono text-xs text-[var(--fg)] font-medium">
                     {TIMELINE[activeMilestoneIndex]?.title}
                   </span>
-                  <span className="rounded-full border border-[var(--line)] bg-[var(--surface-subtle)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
+                  <span className="rounded-full border border-[var(--line)] bg-[var(--surface-elevated)]/60 dark:bg-white/5 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
                     {TIMELINE[activeMilestoneIndex]?.period}
                   </span>
                 </div>
@@ -670,6 +672,7 @@ export function TimelineAndActivitySection() {
               <div className="relative flex items-center justify-center py-2" style={{ height: '360px' }}>
                 <CardSwap
                   ref={swapRef}
+                  theme={theme}
                   width={520}
                   height={290}
                   cardDistance={38}
@@ -688,14 +691,14 @@ export function TimelineAndActivitySection() {
                   {TIMELINE.map((entry, idx) => (
                     <Card
                       key={`${entry.period}-${entry.title}`}
-                      className="p-6 flex flex-col justify-between select-none cursor-grab active:cursor-grabbing border border-[var(--line)]"
+                      className="p-6 flex flex-col justify-between select-none cursor-grab active:cursor-grabbing"
                     >
                       <div>
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-semibold text-[var(--accent)]">
                             {entry.period}
                           </span>
-                          <span className="rounded-full border border-[var(--line)] bg-[var(--surface-subtle)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
+                          <span className="rounded-full border border-[var(--line)] bg-[var(--surface-elevated)]/60 dark:bg-white/5 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
                             {entry.category}
                           </span>
                         </div>

@@ -182,14 +182,14 @@ const THEMES: Record<'dark' | 'light', Record<string, string>> = {
     '--swap-shade': 'var(--bg, #0d0d0e)'
   },
   light: {
-    '--swap-tile': 'var(--surface, #ffffff)',
-    '--swap-tile-edge': 'var(--line, rgba(24, 24, 27, 0.1))',
-    '--swap-tile-highlight': 'rgba(255, 255, 255, 1)',
-    '--swap-shadow': '0 24px 48px -20px rgba(0, 0, 0, 0.15), 0 6px 14px -6px rgba(0, 0, 0, 0.08)',
-    '--swap-media-edge': 'var(--line, rgba(24, 24, 27, 0.1))',
+    '--swap-tile': '#FAF8F5',
+    '--swap-tile-edge': 'rgba(60, 45, 30, 0.08)',
+    '--swap-tile-highlight': 'rgba(255, 255, 255, 0.95)',
+    '--swap-shadow': '0 18px 38px -18px rgba(60, 45, 30, 0.08), 0 4px 12px -4px rgba(60, 45, 30, 0.04)',
+    '--swap-media-edge': 'rgba(60, 45, 30, 0.08)',
     '--swap-ink': 'var(--fg, #18181b)',
-    '--swap-badge': 'var(--surface-subtle, rgba(24, 24, 27, 0.04))',
-    '--swap-shade': 'var(--bg, #f4f4f5)'
+    '--swap-badge': 'rgba(60, 45, 30, 0.04)',
+    '--swap-shade': '#E7E2D7'
   }
 };
 
@@ -909,6 +909,47 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(
     useIsomorphicLayoutEffect(() => {
       apiRef.current?.refresh();
     });
+
+    useEffect(() => {
+      const root = rootRef.current;
+      if (!root) return;
+
+      let isHovered = false;
+
+      const onEnter = () => {
+        isHovered = true;
+      };
+
+      const onLeave = () => {
+        isHovered = false;
+      };
+
+      const onWindowKeyDown = (e: KeyboardEvent) => {
+        if (!isHovered && document.activeElement !== root) return;
+        const target = e.target as HTMLElement | null;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          apiRef.current?.next();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          apiRef.current?.prev();
+        }
+      };
+
+      root.addEventListener('pointerenter', onEnter);
+      root.addEventListener('pointerleave', onLeave);
+      window.addEventListener('keydown', onWindowKeyDown);
+
+      return () => {
+        root.removeEventListener('pointerenter', onEnter);
+        root.removeEventListener('pointerleave', onLeave);
+        window.removeEventListener('keydown', onWindowKeyDown);
+      };
+    }, []);
 
     const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {

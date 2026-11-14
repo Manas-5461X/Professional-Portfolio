@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from '@phosphor-icons/react';
 import { type SkillCategory, type SkillMaturity } from '../content/skills';
@@ -43,6 +43,48 @@ export function SkillsDrum3D({
   const goToPrev = useCallback(() => {
     setActiveIndex((prev) => (prev - 1 + total) % total);
   }, [total]);
+
+  // Hover-activated keyboard arrow navigation: user can swipe simply by hovering the drum area
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let isHovered = false;
+
+    const onEnter = () => {
+      isHovered = true;
+    };
+
+    const onLeave = () => {
+      isHovered = false;
+    };
+
+    const onWindowKeyDown = (e: KeyboardEvent) => {
+      if (!isHovered && document.activeElement !== el) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToPrev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToNext();
+      }
+    };
+
+    el.addEventListener('pointerenter', onEnter);
+    el.addEventListener('pointerleave', onLeave);
+    window.addEventListener('keydown', onWindowKeyDown);
+
+    return () => {
+      el.removeEventListener('pointerenter', onEnter);
+      el.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('keydown', onWindowKeyDown);
+    };
+  }, [goToPrev, goToNext]);
 
   // Keyboard navigation when drum area is focused
   const handleKeyDown = useCallback(
@@ -242,8 +284,8 @@ export function SkillsDrum3D({
                 }}
                 className={`absolute left-1/2 top-1/2 w-full max-w-2xl h-[420px] rounded-2xl border transition-all duration-500 ease-out ${
                   isCenter
-                    ? 'border-[var(--line-strong)] bg-[var(--surface-elevated,var(--surface))] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.35)] ring-1 ring-[var(--line)]'
-                    : 'border-[var(--line)] bg-[var(--surface-subtle)] cursor-pointer hover:border-[var(--accent)] hover:opacity-70'
+                    ? 'border-[var(--line-strong)] bg-[#FAF8F5] dark:bg-[var(--surface-elevated,var(--surface))] shadow-[0_20px_48px_-16px_rgba(60,45,30,0.08)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.6)] ring-1 ring-[var(--line)]'
+                    : 'border-[var(--line)] bg-[#EFECE4] dark:bg-[var(--surface-subtle)] cursor-pointer hover:border-[var(--accent)] hover:opacity-70'
                 }`}
                 style={{
                   transform: reduced
