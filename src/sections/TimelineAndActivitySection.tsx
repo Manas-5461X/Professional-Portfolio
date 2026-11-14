@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, ArrowUpRight } from '@phosphor-icons/react';
 import { useGSAP } from '@gsap/react';
 import { GITHUB_ACTIVITY, type ContributionDay, type GitHubActivityData } from '../content/github';
 import { PROFILE, TIMELINE, VERIFIED_MILESTONES } from '../content/profile';
 import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
+import { CardSwap, Card, type CardSwapHandle } from '../components/CardSwap';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -24,6 +25,8 @@ export function TimelineAndActivitySection() {
   const [activity, setActivity] = useState<GitHubActivityData>(GITHUB_ACTIVITY);
   const [isLive, setIsLive] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
+  const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
+  const swapRef = useRef<CardSwapHandle | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -290,42 +293,161 @@ export function TimelineAndActivitySection() {
           </div>
 
           <div className="lg:col-span-8">
-            {/* Mobile swipe helper */}
-            <div className="mb-3 flex items-center justify-between sm:hidden font-mono text-[11px] text-[var(--muted)]">
-              <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">Milestones</span>
-              <span>← Swipe timeline ({TIMELINE.length}) →</span>
+            {/* Mobile View: Clean horizontal touch swipe track */}
+            <div className="md:hidden">
+              <div className="mb-3 flex items-center justify-between font-mono text-[11px] text-[var(--muted)]">
+                <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">Milestones</span>
+                <span>← Swipe timeline ({TIMELINE.length}) →</span>
+              </div>
+
+              <ol
+                ref={timelineListRef}
+                className="flex gap-3 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4"
+              >
+                {TIMELINE.map((entry, idx) => (
+                  <li
+                    key={`${entry.period}-${entry.title}`}
+                    className="timeline-entry min-w-[275px] max-w-[295px] shrink-0 snap-start rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
+                        <span className="font-mono text-[10px] text-[var(--muted)]">
+                          {String(idx + 1).padStart(2, '0')} / {String(TIMELINE.length).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">
+                        {entry.category}
+                      </p>
+                      <h3 className="mt-2 text-sm font-semibold text-[var(--fg)]">{entry.title}</h3>
+                      <p className="mt-1.5 text-xs leading-relaxed text-[var(--fg-2)]">{entry.summary}</p>
+                    </div>
+                    {entry.evidence && (
+                      <p className="mt-3 border-t border-[var(--line)] pt-2 font-mono text-[10px] text-[var(--muted)]">
+                        Artifact: {entry.evidence}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ol>
             </div>
 
-            <ol
-              ref={timelineListRef}
-              className="flex gap-3 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sm:block sm:divide-y sm:divide-[var(--line)] sm:border-y sm:border-[var(--line)] sm:overflow-visible sm:pb-0 sm:pt-0"
-            >
-              {TIMELINE.map((entry, idx) => (
-                <li
-                  key={`${entry.period}-${entry.title}`}
-                  className="timeline-entry min-w-[275px] max-w-[295px] shrink-0 snap-start rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:min-w-0 sm:max-w-none sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:py-5 grid grid-cols-1 gap-2 sm:grid-cols-12 sm:gap-6"
+            {/* Desktop View: Interactive 3D Stacked CardSwap Deck */}
+            <div data-cardswap-deck className="hidden md:block">
+              {/* Deck Header & Navigation Controls */}
+              <div className="mb-4 flex items-center justify-between border-b border-[var(--line)] pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs font-semibold text-[var(--accent)]">
+                    {String(activeMilestoneIndex + 1).padStart(2, '0')} / {String(TIMELINE.length).padStart(2, '0')}
+                  </span>
+                  <span className="h-3 w-px bg-[var(--line)]" aria-hidden="true" />
+                  <span className="font-mono text-xs text-[var(--fg)] font-medium">
+                    {TIMELINE[activeMilestoneIndex]?.title}
+                  </span>
+                  <span className="rounded-full border border-[var(--line)] bg-[var(--surface-subtle)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
+                    {TIMELINE[activeMilestoneIndex]?.period}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="hidden xl:inline font-mono text-[11px] text-[var(--muted)] mr-1">
+                    Drag card or use arrows
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => swapRef.current?.prev()}
+                    aria-label="Previous milestone"
+                    className="btn-tactile inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--line)] bg-[var(--surface)] text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                  >
+                    <ArrowLeft size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => swapRef.current?.next()}
+                    aria-label="Next milestone"
+                    className="btn-tactile inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--line)] bg-[var(--surface)] text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                  >
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* 3D Stack Deck */}
+              <div className="relative flex items-center justify-center py-2" style={{ height: '360px' }}>
+                <CardSwap
+                  ref={swapRef}
+                  width={520}
+                  height={290}
+                  cardDistance={38}
+                  verticalDistance={14}
+                  skewAmount={3}
+                  visibleCards={3}
+                  delay={4500}
+                  autoplay={true}
+                  pauseOnHover={true}
+                  draggable={true}
+                  onChange={(index) => setActiveMilestoneIndex(index)}
+                  className="w-full h-full"
                 >
-                  <div className="sm:col-span-4">
-                    <div className="flex items-center justify-between sm:block">
-                      <span className="font-mono text-xs font-semibold text-[var(--accent)]">{entry.period}</span>
-                      <span className="font-mono text-[10px] text-[var(--muted)] sm:hidden">
-                        {String(idx + 1).padStart(2, '0')} / {String(TIMELINE.length).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-[var(--muted)]">
-                      {entry.category}
-                    </p>
-                  </div>
-                  <div className="sm:col-span-8">
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--fg)]">{entry.title}</h3>
-                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--fg-2)]">{entry.summary}</p>
-                    {entry.evidence && (
-                      <p className="mt-2 font-mono text-[11px] sm:text-xs text-[var(--muted)]">Artifact: {entry.evidence}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
+                  {TIMELINE.map((entry, idx) => (
+                    <Card
+                      key={`${entry.period}-${entry.title}`}
+                      className="p-6 flex flex-col justify-between select-none cursor-grab active:cursor-grabbing border border-[var(--line)]"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-xs font-semibold text-[var(--accent)]">
+                            {entry.period}
+                          </span>
+                          <span className="rounded-full border border-[var(--line)] bg-[var(--surface-subtle)] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--muted)]">
+                            {entry.category}
+                          </span>
+                        </div>
+                        <h3 className="mt-3 text-base sm:text-lg font-semibold text-[var(--fg)] leading-snug">
+                          {entry.title}
+                        </h3>
+                        <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[var(--fg-2)] line-clamp-3">
+                          {entry.summary}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 border-t border-[var(--line)] pt-3 flex items-center justify-between text-[11px] font-mono text-[var(--muted)]">
+                        <span className="truncate max-w-[280px]">
+                          {entry.evidence ? `Artifact: ${entry.evidence}` : 'Academic & Open-Source Progression'}
+                        </span>
+                        <span className="text-[var(--accent)] font-semibold shrink-0">
+                          {String(idx + 1).padStart(2, '0')} / {String(TIMELINE.length).padStart(2, '0')}
+                        </span>
+                      </div>
+                    </Card>
+                  ))}
+                </CardSwap>
+              </div>
+
+              {/* Stepper Dots Rail */}
+              <div className="mt-3 flex items-center justify-center gap-1.5" aria-hidden="true">
+                {TIMELINE.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    onClick={() => {
+                      const diff = dotIdx - activeMilestoneIndex;
+                      if (diff > 0) {
+                        for (let i = 0; i < diff; i++) swapRef.current?.next();
+                      } else if (diff < 0) {
+                        for (let i = 0; i < Math.abs(diff); i++) swapRef.current?.prev();
+                      }
+                    }}
+                    aria-label={`Jump to milestone ${dotIdx + 1}`}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      dotIdx === activeMilestoneIndex
+                        ? 'w-6 bg-[var(--accent)]'
+                        : 'w-1.5 bg-[var(--line-strong)] hover:bg-[var(--muted)]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
