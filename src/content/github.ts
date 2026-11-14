@@ -4,6 +4,37 @@ export interface ContributionDay {
   count: number;
 }
 
+export interface LanguageShare {
+  name: string;
+  count: number;
+  percent: number;
+  color: string;
+}
+
+export const LANGUAGE_COLORS: Record<string, string> = {
+  Python: '#38bdf8',
+  JavaScript: '#facc15',
+  TypeScript: '#3b82f6',
+  HTML: '#f97316',
+  CSS: '#a855f7',
+  Java: '#d97706',
+  Dart: '#06b6d4',
+  C: '#10b981',
+  'C++': '#ec4899',
+  Shell: '#84cc16'
+};
+
+export const GITHUB_STACK_BASELINE: LanguageShare[] = [
+  { name: 'Python', count: 8, percent: 31, color: '#38bdf8' },
+  { name: 'JavaScript', count: 5, percent: 19, color: '#facc15' },
+  { name: 'TypeScript', count: 4, percent: 15, color: '#3b82f6' },
+  { name: 'HTML', count: 3, percent: 12, color: '#f97316' },
+  { name: 'CSS', count: 3, percent: 12, color: '#a855f7' },
+  { name: 'Java', count: 1, percent: 4, color: '#d97706' },
+  { name: 'Dart', count: 1, percent: 4, color: '#06b6d4' },
+  { name: 'C', count: 1, percent: 4, color: '#10b981' }
+];
+
 export interface GitHubActivityData {
   username: string;
   generatedAt: string;
@@ -18,6 +49,8 @@ export interface GitHubActivityData {
   originalRepos: number;
   totalStars: number;
   weeks: ContributionDay[][];
+  last30Days?: ContributionDay[];
+  stackDistribution?: LanguageShare[];
 }
 
 export const GITHUB_ACTIVITY: GitHubActivityData = {
@@ -43,6 +76,7 @@ export const GITHUB_ACTIVITY: GitHubActivityData = {
   "publicRepos": 32,
   "originalRepos": 23,
   "totalStars": 28,
+  "stackDistribution": GITHUB_STACK_BASELINE,
   "weeks": [
     [
       {

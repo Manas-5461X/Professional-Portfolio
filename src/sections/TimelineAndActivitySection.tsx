@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Code, Database } from '@phosphor-icons/react';
 import { useGSAP } from '@gsap/react';
-import { GITHUB_ACTIVITY, type ContributionDay, type GitHubActivityData } from '../content/github';
+import {
+  GITHUB_ACTIVITY,
+  GITHUB_STACK_BASELINE,
+  LANGUAGE_COLORS,
+  type ContributionDay,
+  type GitHubActivityData,
+  type LanguageShare
+} from '../content/github';
+import { LEETCODE_BASELINE, type LeetCodeData } from '../content/leetcode';
 import { PROFILE, TIMELINE, VERIFIED_MILESTONES } from '../content/profile';
 import { gsap, ScrollTrigger, isReducedMotion } from '../lib/smooth';
 import { CardSwap, Card, type CardSwapHandle } from '../components/CardSwap';
@@ -26,6 +34,9 @@ export function TimelineAndActivitySection() {
   const [isLive, setIsLive] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<ContributionDay | null>(null);
   const [activeMilestoneIndex, setActiveMilestoneIndex] = useState(0);
+  const [hoveredVelocityDay, setHoveredVelocityDay] = useState<ContributionDay | null>(null);
+  const [hoveredLang, setHoveredLang] = useState<string | null>(null);
+  const [leetcode, setLeetcode] = useState<LeetCodeData>(LEETCODE_BASELINE);
   const swapRef = useRef<CardSwapHandle | null>(null);
 
   useEffect(() => {
@@ -128,6 +139,30 @@ export function TimelineAndActivitySection() {
 
           const finalTotal = Math.max(total, GITHUB_ACTIVITY.totalContributions);
           const finalActiveDays = Math.max(activeDays, GITHUB_ACTIVITY.activeDays);
+          const last30Days = days.slice(-30);
+
+          const langMap: Record<string, number> = {};
+          let totalLangs = 0;
+          if (reposRes.status === 'fulfilled' && Array.isArray(reposRes.value)) {
+            for (const r of reposRes.value) {
+              if (r.language) {
+                langMap[r.language] = (langMap[r.language] || 0) + 1;
+                totalLangs++;
+              }
+            }
+          }
+
+          const dynamicStack: LanguageShare[] =
+            totalLangs > 0
+              ? Object.entries(langMap)
+                  .map(([name, count]) => ({
+                    name,
+                    count,
+                    percent: Math.round((count / totalLangs) * 100),
+                    color: LANGUAGE_COLORS[name] || '#38bdf8'
+                  }))
+                  .sort((a, b) => b.count - a.count)
+              : GITHUB_STACK_BASELINE;
 
           const liveData: GitHubActivityData = {
             username: handle,
@@ -145,7 +180,9 @@ export function TimelineAndActivitySection() {
             publicRepos,
             originalRepos,
             totalStars,
-            weeks
+            weeks,
+            last30Days,
+            stackDistribution: dynamicStack
           };
 
           try {
@@ -163,7 +200,29 @@ export function TimelineAndActivitySection() {
       }
     }
 
+    async function loadLeetCode() {
+      try {
+        const cached = sessionStorage.getItem('live_leetcode_stats');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed?.totalSolved && !cancelled) {
+            setLeetcode((prev) => ({ ...prev, ...parsed }));
+            return;
+          }
+        }
+        const res = await fetch('/api/leetcode');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.totalSolved && !cancelled) {
+            setLeetcode((prev) => ({ ...prev, ...data }));
+            sessionStorage.setItem('live_leetcode_stats', JSON.stringify(data));
+          }
+        }
+      } catch {}
+    }
+
     void loadLiveGitHub();
+    void loadLeetCode();
     return () => {
       cancelled = true;
     };
@@ -269,6 +328,22 @@ export function TimelineAndActivitySection() {
     },
     { scope: sectionRef }
   );
+
+  const velocity30 =
+    activity.last30Days && activity.last30Days.length === 30
+      ? activity.last30Days
+      : activity.weeks.flat().slice(-30);
+  const totalVelocity30 = velocity30.reduce((acc, d) => acc + d.count, 0);
+  const maxVelocity30 = Math.max(1, ...velocity30.map((d) => d.count));
+  const peakDay30 = velocity30.reduce((best, curr) => (curr.count > best.count ? curr : best), {
+    date: '',
+    count: 0
+  });
+
+  const stack =
+    activity.stackDistribution && activity.stackDistribution.length > 0
+      ? activity.stackDistribution
+      : GITHUB_STACK_BASELINE;
 
   return (
     <section
@@ -535,6 +610,230 @@ export function TimelineAndActivitySection() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Live Telemetry Modules: Commit Velocity, Stack Distribution, and LeetCode */}
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Module 1: Commit Velocity (30 Days) - Cyan equalizer */}
+            <div className="lg:col-span-6 rounded-xl border border-cyan-500/25 bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between shadow-[0_0_30px_-15px_rgba(6,182,212,0.2)]">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#38bdf8]" />
+                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-cyan-400">
+                      Commit Velocity (30 Days)
+                    </span>
+                  </div>
+                  <span className="font-mono text-[11px] text-[var(--muted)] tabular-nums">
+                    {totalVelocity30} commits
+                  </span>
+                </div>
+
+                <div className="mt-1 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-[var(--muted)]">
+                    Peak: <span className="text-cyan-300 font-medium">{peakDay30.count}</span> on {peakDay30.date}
+                  </span>
+                  <span className="text-cyan-400 font-medium" aria-live="polite">
+                    {hoveredVelocityDay
+                      ? `${hoveredVelocityDay.date}: ${hoveredVelocityDay.count} commits`
+                      : 'Hover a day bar'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Equalizer Visualizer */}
+              <div className="mt-6 pt-4 border-t border-[var(--line)]">
+                <div className="relative h-28 w-full flex items-end justify-between gap-1 sm:gap-1.5 px-1 pb-1 border-b border-cyan-500/30">
+                  {/* Faint horizontal baseline gridlines */}
+                  <div className="absolute inset-0 pointer-events-none flex flex-col justify-between opacity-15">
+                    <div className="border-b border-cyan-400 border-dashed w-full" />
+                    <div className="border-b border-cyan-400 border-dashed w-full" />
+                    <div className="border-b border-cyan-400 border-dashed w-full" />
+                  </div>
+
+                  {velocity30.map((d) => {
+                    const heightPercent = Math.max(8, Math.round((d.count / maxVelocity30) * 100));
+                    const isHovered = hoveredVelocityDay?.date === d.date;
+                    return (
+                      <button
+                        key={d.date}
+                        type="button"
+                        onMouseEnter={() => setHoveredVelocityDay(d)}
+                        onFocus={() => setHoveredVelocityDay(d)}
+                        onMouseLeave={() => setHoveredVelocityDay(null)}
+                        onBlur={() => setHoveredVelocityDay(null)}
+                        aria-label={`${d.date}: ${d.count} commits`}
+                        className={`flex-1 rounded-t-[3px] transition-all duration-200 relative group cursor-pointer ${
+                          isHovered
+                            ? 'bg-white shadow-[0_0_12px_#38bdf8] scale-y-105'
+                            : d.count > 0
+                            ? 'bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_6px_rgba(56,189,248,0.5)] hover:shadow-[0_0_10px_#38bdf8]'
+                            : 'bg-cyan-950/40 hover:bg-cyan-800/50'
+                        }`}
+                        style={{ height: `${heightPercent}%` }}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-[var(--muted)] px-1">
+                  <span>30 days ago</span>
+                  <span>Today</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Module 2: Stack Distribution (Live Repos) - Segmented Multi-Color */}
+            <div className="lg:col-span-6 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Database size={15} className="text-yellow-400" />
+                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-yellow-400">
+                      Stack Distribution (Live Repos)
+                    </span>
+                  </div>
+                  <span className="font-mono text-[11px] text-[var(--muted)]">
+                    {activity.publicRepos} Repositories
+                  </span>
+                </div>
+                <p className="mt-1 text-[11px] font-mono text-[var(--muted)]">
+                  Primary language share extracted directly from public source code.
+                </p>
+              </div>
+
+              {/* Segmented Progress Bar */}
+              <div className="mt-6">
+                <div className="h-3.5 w-full rounded-full bg-[var(--surface-subtle)] overflow-hidden flex border border-[var(--line)] p-0.5 gap-0.5 shadow-inner">
+                  {stack.map((item, idx) => (
+                    <div
+                      key={item.name}
+                      onMouseEnter={() => setHoveredLang(item.name)}
+                      onMouseLeave={() => setHoveredLang(null)}
+                      style={{
+                        width: `${item.percent}%`,
+                        backgroundColor: item.color,
+                        boxShadow: hoveredLang === item.name ? `0 0 10px ${item.color}` : 'none'
+                      }}
+                      className={`h-full transition-all duration-200 cursor-pointer ${
+                        idx === 0 ? 'rounded-l-full' : ''
+                      } ${idx === stack.length - 1 ? 'rounded-r-full' : ''}`}
+                      title={`${item.name}: ${item.percent}% (${item.count} repos)`}
+                    />
+                  ))}
+                </div>
+
+                {/* 2-Column Languages Legend */}
+                <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-mono">
+                  {stack.slice(0, 8).map((item) => {
+                    const isHovered = hoveredLang === item.name;
+                    return (
+                      <div
+                        key={item.name}
+                        onMouseEnter={() => setHoveredLang(item.name)}
+                        onMouseLeave={() => setHoveredLang(null)}
+                        className={`flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${
+                          isHovered ? 'bg-[var(--surface-subtle)]' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="h-2 w-2 rounded-full shrink-0"
+                            style={{
+                              backgroundColor: item.color,
+                              boxShadow: `0 0 6px ${item.color}`
+                            }}
+                          />
+                          <span
+                            className={`truncate text-xs ${
+                              isHovered ? 'text-[var(--accent)] font-medium' : 'text-[var(--fg)]'
+                            }`}
+                          >
+                            {item.name}
+                          </span>
+                        </div>
+                        <span className="font-mono text-xs text-[var(--muted)] font-semibold tabular-nums ml-2">
+                          {item.percent}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Module 3: LeetCode Problem Solving Telemetry */}
+            <div className="lg:col-span-12 rounded-xl border border-amber-500/20 bg-[var(--surface)] p-5 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-[0_0_24px_-12px_rgba(245,158,11,0.12)]">
+              {/* Left Info */}
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-lg border border-amber-500/30 bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0 shadow-[0_0_12px_rgba(245,158,11,0.2)]">
+                  <Code size={24} weight="bold" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-amber-500">
+                      Algorithmic Problem Solving
+                    </span>
+                    <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] text-amber-400">
+                      LeetCode @{leetcode.username}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="font-mono text-2xl font-bold text-[var(--fg)] tabular-nums">
+                      {leetcode.totalSolved}
+                    </span>
+                    <span className="font-mono text-xs text-[var(--muted)]">
+                      Problems Solved
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle: Difficulty Distribution */}
+              <div className="flex-1 max-w-xl">
+                <div className="flex items-center justify-between text-xs font-mono mb-2">
+                  <span className="flex items-center gap-1.5 text-emerald-500 font-medium">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Easy: {leetcode.easySolved} ({Math.round((leetcode.easySolved / leetcode.totalSolved) * 100)}%)
+                  </span>
+                  <span className="flex items-center gap-1.5 text-amber-500 font-medium">
+                    <span className="h-2 w-2 rounded-full bg-amber-500" />
+                    Medium: {leetcode.mediumSolved} ({Math.round((leetcode.mediumSolved / leetcode.totalSolved) * 100)}%)
+                  </span>
+                  <span className="flex items-center gap-1.5 text-rose-500 font-medium">
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                    Hard: {leetcode.hardSolved} ({Math.round((leetcode.hardSolved / leetcode.totalSolved) * 100)}%)
+                  </span>
+                </div>
+                <div className="h-3 w-full rounded-full bg-[var(--surface-subtle)] overflow-hidden flex border border-[var(--line)] p-0.5 gap-0.5">
+                  <div
+                    style={{ width: `${(leetcode.easySolved / leetcode.totalSolved) * 100}%` }}
+                    className="h-full rounded-l-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]"
+                    title={`Easy: ${leetcode.easySolved}`}
+                  />
+                  <div
+                    style={{ width: `${(leetcode.mediumSolved / leetcode.totalSolved) * 100}%` }}
+                    className="h-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)]"
+                    title={`Medium: ${leetcode.mediumSolved}`}
+                  />
+                  <div
+                    style={{ width: `${(leetcode.hardSolved / leetcode.totalSolved) * 100}%` }}
+                    className="h-full rounded-r-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]"
+                    title={`Hard: ${leetcode.hardSolved}`}
+                  />
+                </div>
+              </div>
+
+              {/* Right: CTA Link */}
+              <a
+                href={leetcode.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-tactile inline-flex min-h-[40px] items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--surface)] px-4 font-mono text-xs font-medium text-[var(--fg)] hover:border-amber-500 hover:text-amber-500 shrink-0 self-start md:self-auto transition-colors"
+              >
+                <span>Inspect LeetCode Profile</span>
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
             </div>
           </div>
 
