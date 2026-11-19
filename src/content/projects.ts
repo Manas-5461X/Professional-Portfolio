@@ -325,7 +325,7 @@ export const PROJECTS: ProjectRecord[] = [
     category: 'Network Security & Deep Packet Inspection',
     discipline: 'systems',
     disciplineLabel: 'Systems & Networking',
-    statusLabel: 'CLI Engine v2.0 (24 Stars)',
+    statusLabel: 'CLI Engine v2.0 (26 Stars)',
     timeline: 'Sep to Oct 2026',
     tagline: 'Zero-dependency multi-processed Python PCAP inspector extracting TLS SNI and HTTP Host payloads to classify and filter flows.',
     summary:
@@ -356,7 +356,7 @@ export const PROJECTS: ProjectRecord[] = [
     ],
     repoUrl: 'https://github.com/Manas-5461X/DPI_Engine',
     verifiedHighlights: [
-      { label: 'Community Adoption', value: '24 GitHub Stars' },
+      { label: 'Community Adoption', value: '26 GitHub Stars' },
       { label: 'Runtime Overhead', value: 'Zero External Libs' },
       { label: 'Packet Inspection', value: 'TLS SNI & DNS Parser' }
     ],

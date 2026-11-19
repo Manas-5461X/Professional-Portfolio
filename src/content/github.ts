@@ -60,9 +60,9 @@ export const GITHUB_ACTIVITY: GitHubActivityData = {
     "start": "2025-11-09",
     "end": "2026-11-13"
   },
-  "totalContributions": 1000,
+  "totalContributions": 1047,
   "activeDays": 143,
-  "avgPerActiveDay": 7,
+  "avgPerActiveDay": 7.3,
   "currentStreak": {
     "length": 8
   },
@@ -75,7 +75,7 @@ export const GITHUB_ACTIVITY: GitHubActivityData = {
   },
   "publicRepos": 32,
   "originalRepos": 23,
-  "totalStars": 28,
+  "totalStars": 30,
   "stackDistribution": GITHUB_STACK_BASELINE,
   "weeks": [
     [

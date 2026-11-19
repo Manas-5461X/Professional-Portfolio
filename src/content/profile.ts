@@ -255,10 +255,10 @@ export const TIMELINE: TimelineEntry[] = [
 export const VERIFIED_MILESTONES: VerifiedMilestone[] = [
   {
     id: 'dpi-stars',
-    metric: '24 Stars',
+    metric: '26 Stars',
     label: 'Open-source Community Recognition',
     detail:
-      'DPI Engine, a Python-based Deep Packet Inspection project for PCAP parsing, network protocol analysis and TLS SNI inspection, gained 24 GitHub stars through organic community discovery.',
+      'DPI Engine, a Python-based Deep Packet Inspection project for PCAP parsing, network protocol analysis and TLS SNI inspection, gained 26 GitHub stars through organic community discovery.',
     sourceLabel: 'DPI Engine Repository',
     sourceUrl: 'https://github.com/Manas-5461X/DPI_Engine'
   },
@@ -273,10 +273,10 @@ export const VERIFIED_MILESTONES: VerifiedMilestone[] = [
   },
   {
     id: 'contributions',
-    metric: '957',
+    metric: '1,000+',
     label: 'GitHub Contributions in 12 Months',
     detail:
-      'Recorded 957 GitHub contributions across 141 active days between November 2025 and November 2026, reflecting a combination of software development, repository activity and coding practice.',
+      'Recorded 1,000+ GitHub contributions (1,047 verified) across 143 active days between November 2025 and November 2026, reflecting a combination of software development, repository activity and coding practice.',
     sourceLabel: 'GitHub Profile',
     sourceUrl: 'https://github.com/Manas-5461X'
   },

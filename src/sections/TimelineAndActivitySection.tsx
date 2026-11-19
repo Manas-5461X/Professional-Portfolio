@@ -423,23 +423,50 @@ export function TimelineAndActivitySection() {
 
     async function loadLeetCode() {
       try {
+        const CACHE_TTL_MS = 15 * 60 * 1000;
         const cached = sessionStorage.getItem('live_leetcode_stats');
         if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed?.totalSolved && !cancelled) {
-            setLeetcode((prev) => ({ ...prev, ...parsed }));
-            return;
-          }
+          try {
+            const parsed = JSON.parse(cached);
+            if (
+              parsed?.data?.totalSolved &&
+              Date.now() - (parsed.timestamp || 0) < CACHE_TTL_MS &&
+              !cancelled
+            ) {
+              setLeetcode((prev) => ({ ...prev, ...parsed.data }));
+              return;
+            }
+          } catch {}
         }
-        const res = await fetch('/api/leetcode');
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+
+        const res = await fetch('https://alfa-leetcode-api.onrender.com/userProfile/Manas-5461X', {
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
         if (res.ok) {
-          const data = await res.json();
-          if (data?.totalSolved && !cancelled) {
-            setLeetcode((prev) => ({ ...prev, ...data }));
-            sessionStorage.setItem('live_leetcode_stats', JSON.stringify(data));
+          const json = await res.json();
+          if (json?.totalSolved && !cancelled) {
+            const updated: Partial<LeetCodeData> = {
+              totalSolved: json.totalSolved,
+              easySolved: json.easySolved ?? 97,
+              mediumSolved: json.mediumSolved ?? 55,
+              hardSolved: json.hardSolved ?? 5,
+              ranking: json.ranking ? `#${json.ranking.toLocaleString()}` : undefined
+            };
+            setLeetcode((prev) => ({ ...prev, ...updated }));
+            sessionStorage.setItem(
+              'live_leetcode_stats',
+              JSON.stringify({ data: updated, timestamp: Date.now() })
+            );
           }
         }
-      } catch {}
+      } catch {
+        // Fallback to updated LEETCODE_BASELINE seamlessly
+      }
     }
 
     void loadLiveGitHub();

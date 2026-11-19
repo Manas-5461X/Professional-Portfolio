@@ -11,9 +11,9 @@ export interface LeetCodeData {
 
 export const LEETCODE_BASELINE: LeetCodeData = {
   username: 'Manas-5461X',
-  totalSolved: 151,
-  easySolved: 94,
-  mediumSolved: 52,
+  totalSolved: 157,
+  easySolved: 97,
+  mediumSolved: 55,
   hardSolved: 5,
   profileUrl: 'https://leetcode.com/u/Manas-5461X/'
 };
