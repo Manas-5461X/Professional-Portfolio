@@ -68,6 +68,15 @@ export function HeroSection() {
           >
             LinkedIn <span className="arrow">&#8599;</span>
           </a>
+
+          <a
+            href={PROFILE.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pill"
+          >
+            GitHub <span className="arrow">&#8599;</span>
+          </a>
         </div>
       </div>
 
