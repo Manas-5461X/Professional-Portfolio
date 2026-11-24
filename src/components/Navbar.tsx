@@ -16,6 +16,7 @@ const NAV_LINKS: NavItem[] = [
   { label: 'Projects', hash: '#projects' },
   { label: 'Index', hash: '#skills' },
   { label: 'Exploring', path: '/exploring' },
+  { label: '3D Room', path: '/room' },
   { label: 'Contact', hash: '#contact' }
 ];
 

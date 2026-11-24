@@ -46,6 +46,14 @@ export function HeroSection() {
             <span className="dot" /> See the flagships
           </button>
 
+          <Link
+            to="/room"
+            className="pill"
+            title="Step into interactive 3D engineering lab"
+          >
+            <span className="dot bg-[var(--signal)]" /> 3D Room <span className="arrow">&#8599;</span>
+          </Link>
+
           {/* Resume download hidden for now as requested */}
           {/* <a href="/resume.pdf" download className="pill">
             Resume <span className="arrow">&darr;</span>

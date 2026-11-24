@@ -38,6 +38,35 @@ const ExploringPage = lazyWithRetry(() =>
 const NotFoundPage = lazyWithRetry(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
+const RoomPage = lazyWithRetry(() =>
+  import('./room/RoomPage').then((m) => ({ default: m.RoomPage }))
+);
+
+import { useLocation } from 'react-router-dom';
+
+function AppContent() {
+  const location = useLocation();
+  const isRoom = location.pathname === '/room' || location.pathname === '/workspace';
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--fg)]">
+      {!isRoom && <Navbar />}
+      <main id="main-content" className="flex-1" tabIndex={-1}>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/projects/:slug" element={<ProjectCaseStudyPage />} />
+            <Route path="/exploring" element={<ExploringPage />} />
+            <Route path="/room" element={<RoomPage />} />
+            <Route path="/workspace" element={<RoomPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {!isRoom && <Footer />}
+    </div>
+  );
+}
 
 export function App() {
   useEffect(() => {
@@ -54,20 +83,7 @@ export function App() {
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--fg)]">
-          <Navbar />
-          <main id="main-content" className="flex-1" tabIndex={-1}>
-            <Suspense fallback={<div className="min-h-screen" />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/projects/:slug" element={<ProjectCaseStudyPage />} />
-                <Route path="/exploring" element={<ExploringPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Suspense>
-          </main>
-          <Footer />
-        </div>
+        <AppContent />
       </BrowserRouter>
     </ThemeProvider>
   );

@@ -639,6 +639,14 @@ export function getCurtainForPath(path: string): { label: string; bg: string; fg
     };
   }
 
+  if (clean === '/room' || clean === '/workspace') {
+    return {
+      label: '3D Room',
+      bg: '#141412',
+      fg: '#EEEAE2'
+    };
+  }
+
   for (let i = 0; i < PROJECTS.length; i++) {
     const p = PROJECTS[i];
     if (clean === `/projects/${p.slug}`) {
