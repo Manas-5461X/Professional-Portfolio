@@ -581,13 +581,42 @@ html.motion-ready .statement-word[data-active="true"] {
 .pill.light {
   --page-fg: #eeeae2;
   --page-bg: #121210;
-  border-color: rgba(238, 234, 226, 0.25);
+  border-color: rgba(238, 234, 226, 0.35);
   color: #eeeae2;
+  background: transparent;
+}
+
+.pill.light::before {
+  background: #eeeae2;
 }
 
 .pill.light:hover {
-  color: #121210;
+  color: #121210 !important;
+  background: #eeeae2;
   border-color: #eeeae2;
+}
+
+.pill.light:hover * {
+  color: #121210 !important;
+}
+
+.contact-side .pill {
+  border-color: rgba(238, 234, 226, 0.35);
+  color: #eeeae2;
+}
+
+.contact-side .pill::before {
+  background: #eeeae2;
+}
+
+.contact-side .pill:hover {
+  color: #121210 !important;
+  background: #eeeae2 !important;
+  border-color: #eeeae2 !important;
+}
+
+.contact-side .pill:hover * {
+  color: #121210 !important;
 }
 
 .pill.solid.light {

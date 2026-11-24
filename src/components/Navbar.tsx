@@ -200,7 +200,7 @@ export function Navbar() {
 
           <nav aria-label="Mobile navigation" className="flex flex-col gap-3 my-auto py-8">
             <span className="mono opacity-50 text-xs uppercase tracking-wider mb-2">Navigation</span>
-            {NAV_LINKS.map((item) =>
+            {NAV_LINKS.filter((item) => item.path !== '/room').map((item) =>
               item.path ? (
                 <Link
                   key={item.label}

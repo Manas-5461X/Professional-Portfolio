@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Cube,
@@ -11,7 +11,8 @@ import {
   ArrowsClockwise,
   Sun,
   Moon,
-  Sparkle
+  Sparkle,
+  Monitor
 } from '@phosphor-icons/react';
 import { useTheme } from '../hooks/useTheme';
 import { useMeta } from '../hooks/useMeta';
@@ -31,16 +32,33 @@ export function RoomPage() {
   useMeta({
     title: 'Interactive 3D Workspace | Manas Gandhi',
     description:
-      'Explore Manas Gandhi’s interactive 3D engineering lab: systems server rack, AST architecture whiteboard, workstation, and verified milestones.',
+      'Explore Manas Gandhi’s interactive 3D engineering lab: systems server rack, DSA packet analysis whiteboard, workstation, and verified milestones.',
     path: '/room'
   });
 
   const [activeHotspot, setActiveHotspot] = useState<HotspotId>('overview');
   const [hoveredHotspot, setHoveredHotspot] = useState<HotspotId | null>(null);
-  const [screenPositions, setScreenPositions] = useState<
-    Record<HotspotId, { x: number; y: number; visible: boolean }>
-  >({} as any);
-  const [showPills] = useState(true);
+  const [isMobileScreen, setIsMobileScreen] = useState<boolean>(() => {
+    return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  });
+
+  // Direct DOM references for floating 3D badge pills (Zero React re-render overhead!)
+  const pillElementsRef = useRef<Record<HotspotId, HTMLDivElement | null>>({
+    overview: null,
+    workstation: null,
+    serverRack: null,
+    whiteboard: null,
+    bookshelf: null,
+    trophyStand: null
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileScreen(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const isDrawerOpen = activeHotspot !== 'overview';
 
@@ -67,50 +85,74 @@ export function RoomPage() {
     return () => window.removeEventListener('keydown', onKey);
   }, [activeHotspot, navigate]);
 
+  // Mobile Screen Fallback (Protects phone GPUs and delivers clean UX)
+  if (isMobileScreen) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-[var(--bg)] text-[var(--fg)] text-center">
+        <div className="max-w-md p-8 rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-elevated)] shadow-xl space-y-5">
+          <div className="w-14 h-14 rounded-full bg-[var(--surface-subtle)] border border-[var(--line)] flex items-center justify-center mx-auto text-[var(--signal)]">
+            <Monitor size={28} weight="duotone" />
+          </div>
+          <h2 className="serif text-3xl font-normal tracking-tight">
+            Desktop 3D Experience
+          </h2>
+          <p className="text-sm text-[var(--muted)] leading-relaxed">
+            The interactive 3D engineering lab is optimized for desktop and laptop displays with mouse orbit controls and high-precision lighting.
+          </p>
+          <div className="pt-2">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--signal)] text-[var(--accent-fg)] font-mono text-xs font-semibold hover:opacity-90 transition-opacity"
+            >
+              <ArrowLeft size={14} weight="bold" /> Return to Portfolio
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const navItems: { id: HotspotId; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Room', icon: <Cube size={15} /> },
     { id: 'workstation', label: 'Workstation', icon: <Desktop size={15} /> },
     { id: 'serverRack', label: 'Server Rack', icon: <HardDrives size={15} /> },
-    { id: 'whiteboard', label: 'Whiteboard', icon: <TreeStructure size={15} /> },
+    { id: 'whiteboard', label: 'DSA & Analysis', icon: <TreeStructure size={15} /> },
     { id: 'bookshelf', label: 'CS Library', icon: <BookOpen size={15} /> },
     { id: 'trophyStand', label: 'Milestones', icon: <Trophy size={15} /> }
   ];
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[var(--bg)] text-[var(--fg)] select-none font-sans">
-      {/* 1. 3D WebGL Canvas */}
+      {/* 1. High-Performance Three.js Canvas */}
       <RoomCanvas
         isDark={isDark}
         activeHotspot={activeHotspot}
         onSelectHotspot={handleSelectHotspot}
         onHoverHotspot={setHoveredHotspot}
-        onUpdateScreenPositions={setScreenPositions}
+        pillElementsRef={pillElementsRef}
         isDrawerOpen={isDrawerOpen}
       />
 
-      {/* 2. Floating 3D Hotspot Badges (Rendered in screen space over 3D objects) */}
-      {!isDrawerOpen && showPills && (
+      {/* 2. Floating 3D Hotspot Badges (Updated directly via DOM refs - ZERO re-renders!) */}
+      {!isDrawerOpen && (
         <div className="absolute inset-0 pointer-events-none z-20">
           {(['workstation', 'serverRack', 'whiteboard', 'bookshelf', 'trophyStand'] as HotspotId[]).map((key) => {
-            const pos = screenPositions[key];
-            if (!pos || !pos.visible) return null;
             const meta = ROOM_HOTSPOTS[key];
             const isHovered = hoveredHotspot === key;
 
             return (
               <div
                 key={key}
-                style={{
-                  left: `${pos.x}px`,
-                  top: `${pos.y}px`,
-                  transform: 'translate(-50%, -50%)'
+                ref={(el) => {
+                  pillElementsRef.current[key] = el;
                 }}
-                className="absolute pointer-events-auto transition-transform duration-200"
+                style={{ display: 'none' }}
+                className="absolute pointer-events-auto transition-transform duration-100 will-change-transform"
               >
                 <button
                   type="button"
                   onClick={() => handleSelectHotspot(key)}
-                  className={`group flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border shadow-lg transition-all duration-200 cursor-pointer ${
+                  className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full backdrop-blur-md border shadow-lg transition-all duration-200 cursor-pointer ${
                     isHovered
                       ? 'bg-[var(--signal)] text-[var(--accent-fg)] border-[var(--signal)] scale-110 ring-4 ring-[var(--accent-tint)]'
                       : 'bg-[var(--surface-elevated)]/90 text-[var(--fg)] border-[var(--line-strong)] hover:border-[var(--signal)] hover:scale-105'
@@ -132,26 +174,26 @@ export function RoomPage() {
       )}
 
       {/* 3. Top Navigation Bar */}
-      <header className="room-ui-overlay absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-[var(--surface)]/80 backdrop-blur-md border-b border-[var(--line)]">
-        {/* Brand & Mode */}
+      <header className="room-ui-overlay absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-3.5 bg-[var(--surface)]/85 backdrop-blur-md border-b border-[var(--line)]">
+        {/* Brand */}
         <div className="flex items-center gap-3">
           <Link
             to="/"
             className="flex items-center gap-2 group text-inherit hover:text-[var(--signal)] transition-colors"
-            title="Return to 2D portfolio"
+            title="Return to portfolio"
           >
             <ArrowLeft size={16} weight="bold" />
-            <span className="serif text-xl sm:text-2xl font-normal italic">Manas Gandhi</span>
+            <span className="serif text-2xl font-normal italic">Manas Gandhi</span>
           </Link>
-          <span className="hidden md:inline-flex items-center gap-1.5 font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-[var(--surface-subtle)] text-[var(--muted)] border border-[var(--line)]">
-            <Sparkle size={12} className="text-[var(--signal)]" /> 3D Workspace
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-[var(--surface-subtle)] text-[var(--muted)] border border-[var(--line)]">
+            <Sparkle size={12} className="text-[var(--signal)]" /> 3D Cyber Lab
           </span>
         </div>
 
-        {/* Hotspot Direct Links */}
+        {/* Hotspot Direct Jump Links */}
         <nav
           aria-label="3D room zones"
-          className="hidden md:flex items-center gap-1.5 p-1 rounded-full bg-[var(--surface-subtle)] border border-[var(--line)] overflow-x-auto"
+          className="flex items-center gap-1.5 p-1 rounded-full bg-[var(--surface-subtle)] border border-[var(--line)]"
         >
           {navItems.map((item) => {
             const isActive = activeHotspot === item.id;
@@ -174,8 +216,7 @@ export function RoomPage() {
         </nav>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2">
-          {/* Reset Camera View button */}
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setActiveHotspot('overview')}
@@ -185,41 +226,31 @@ export function RoomPage() {
             <ArrowsClockwise size={15} />
           </button>
 
-          {/* Theme Toggle (Daylight / Night Workstation) */}
           <button
             type="button"
             onClick={toggleTheme}
-            title={isDark ? 'Switch to daylight loft' : 'Switch to night workstation'}
+            title={isDark ? 'Switch to daylight loft' : 'Switch to night cyber lab'}
             aria-label="Toggle 3D room theme"
             className="btn-tactile flex items-center justify-center w-8 h-8 rounded-full border border-[var(--line)] bg-[var(--surface)] hover:border-[var(--signal)] text-[var(--fg)] transition-colors"
           >
             {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
 
-          {/* Exit to Portfolio link */}
           <Link
             to="/"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--line-strong)] text-xs font-mono font-medium hover:border-[var(--signal)] hover:text-[var(--signal)] transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--line-strong)] text-xs font-mono font-medium hover:border-[var(--signal)] hover:text-[var(--signal)] transition-colors"
           >
             2D Portfolio
           </Link>
         </div>
       </header>
 
-      {/* 4. Bottom Hint / Quick Bar */}
-      <footer className="room-ui-overlay absolute bottom-4 left-4 right-4 z-30 pointer-events-none flex items-center justify-between">
-        <div className="pointer-events-auto hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)]/80 backdrop-blur-md border border-[var(--line)] font-mono text-[11px] text-[var(--muted)]">
+      {/* 4. Bottom Hint Bar */}
+      <footer className="room-ui-overlay absolute bottom-4 left-6 right-6 z-30 pointer-events-none flex items-center justify-between">
+        <div className="pointer-events-auto flex items-center gap-2.5 px-4 py-2 rounded-full bg-[var(--surface)]/90 backdrop-blur-md border border-[var(--line)] font-mono text-[11px] text-[var(--muted)] shadow-md">
           <span className="w-2 h-2 rounded-full bg-[var(--signal)] animate-pulse" />
-          <span>Click any 3D object to inspect • Drag to orbit • Press ESC for overview</span>
+          <span>Click any 3D object to inspect • Drag to orbit room • Press ESC to return to overview</span>
         </div>
-
-        {/* Mobile quick exit button */}
-        <Link
-          to="/"
-          className="pointer-events-auto sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--surface)]/90 backdrop-blur-md border border-[var(--line)] text-xs font-mono text-[var(--fg)]"
-        >
-          <ArrowLeft size={13} /> Exit 3D
-        </Link>
       </footer>
 
       {/* 5. Interactive Drawers */}

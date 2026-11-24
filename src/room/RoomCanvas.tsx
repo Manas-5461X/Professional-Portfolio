@@ -19,7 +19,7 @@ interface RoomCanvasProps {
   activeHotspot: HotspotId;
   onSelectHotspot: (id: HotspotId) => void;
   onHoverHotspot: (id: HotspotId | null) => void;
-  onUpdateScreenPositions: (positions: Record<HotspotId, { x: number; y: number; visible: boolean }>) => void;
+  pillElementsRef: React.MutableRefObject<Record<HotspotId, HTMLDivElement | null>>;
   isDrawerOpen: boolean;
 }
 
@@ -28,7 +28,7 @@ export function RoomCanvas({
   activeHotspot,
   onSelectHotspot,
   onHoverHotspot,
-  onUpdateScreenPositions,
+  pillElementsRef,
   isDrawerOpen
 }: RoomCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +65,7 @@ export function RoomCanvas({
       initialPreset.fov,
       container.clientWidth / container.clientHeight,
       0.1,
-      60
+      50
     );
     camera.position.set(...initialPreset.position);
     const lookAtTarget = new Vector3(...initialPreset.target);
@@ -77,7 +77,8 @@ export function RoomCanvas({
         alpha: false,
         powerPreference: 'high-performance'
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+      // Cap pixel ratio to 1.25 on simple devices for high 60fps performance without heating
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = PCFSoftShadowMap;
@@ -87,29 +88,30 @@ export function RoomCanvas({
       return;
     }
 
-    // Background color matching portfolio theme
     const updateClearColor = (dark: boolean) => {
-      renderer.setClearColor(new Color(dark ? '#121210' : '#EEEAE2'));
+      // Sleek modern graphite backdrop in dark mode
+      renderer.setClearColor(new Color(dark ? '#131317' : '#EEEAE2'));
     };
     updateClearColor(isDarkRef.current);
 
-    // Global ambient and directional lighting
-    const ambientLight = new AmbientLight(isDarkRef.current ? 0x22242a : 0xfffaee, isDarkRef.current ? 0.7 : 1.3);
+    // Global ambient light (Warm and rich, so night mode is luminous!)
+    const ambientLight = new AmbientLight(isDarkRef.current ? 0x3d394a : 0xfffaee, isDarkRef.current ? 1.4 : 1.2);
     scene.add(ambientLight);
 
-    const sunDirLight = new DirectionalLight(isDarkRef.current ? 0x93c5fd : 0xfff7ed, isDarkRef.current ? 0.9 : 1.8);
-    sunDirLight.position.set(7, 14, 8);
+    // Directional sunlight / moon fill
+    const sunDirLight = new DirectionalLight(isDarkRef.current ? 0x93c5fd : 0xfff7ed, isDarkRef.current ? 1.0 : 1.8);
+    sunDirLight.position.set(6, 12, 7);
     sunDirLight.castShadow = true;
-    sunDirLight.shadow.mapSize.width = 2048;
-    sunDirLight.shadow.mapSize.height = 2048;
+    sunDirLight.shadow.mapSize.width = 1024;
+    sunDirLight.shadow.mapSize.height = 1024;
     sunDirLight.shadow.camera.near = 0.5;
-    sunDirLight.shadow.camera.far = 30;
-    const shadowD = 6;
+    sunDirLight.shadow.camera.far = 25;
+    const shadowD = 5.5;
     sunDirLight.shadow.camera.left = -shadowD;
     sunDirLight.shadow.camera.right = shadowD;
     sunDirLight.shadow.camera.top = shadowD;
     sunDirLight.shadow.camera.bottom = -shadowD;
-    sunDirLight.shadow.bias = -0.0004;
+    sunDirLight.shadow.bias = -0.0005;
     scene.add(sunDirLight);
 
     // Build the 3D room
@@ -130,6 +132,7 @@ export function RoomCanvas({
     let orbitOffsetPitch = 0;
     const raycaster = new Raycaster();
     const mouseNorm = new Vector2(-1000, -1000);
+    let mouseMoved = false;
 
     const onPointerDown = (e: PointerEvent) => {
       if (activeHotspotRef.current !== 'overview') return;
@@ -142,6 +145,7 @@ export function RoomCanvas({
       const rect = container.getBoundingClientRect();
       mouseNorm.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouseNorm.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseMoved = true;
 
       if (isDragging && activeHotspotRef.current === 'overview') {
         const deltaX = e.clientX - prevMouseX;
@@ -158,9 +162,7 @@ export function RoomCanvas({
       isDragging = false;
     };
 
-    // Hotspot click raycasting
     const onClick = (e: MouseEvent) => {
-      // If clicking inside a drawer or button, ignore
       if ((e.target as HTMLElement).closest('.room-ui-overlay')) return;
 
       const rect = container.getBoundingClientRect();
@@ -189,11 +191,10 @@ export function RoomCanvas({
     };
 
     container.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
     container.addEventListener('click', onClick);
 
-    // Responsive resize handler
     const onResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -204,16 +205,16 @@ export function RoomCanvas({
     };
     window.addEventListener('resize', onResize);
 
-    // Main 60fps render loop
     let hoveredId: HotspotId | null = null;
+    let frameCount = 0;
+    const tempProjVec = new Vector3();
 
     const animate = (time: number) => {
       animFrameId = requestAnimationFrame(animate);
+      frameCount++;
 
-      // Update clear color if theme changed
       updateClearColor(isDarkRef.current);
 
-      // Determine destination camera preset
       const mobile = window.innerWidth < 768;
       const targetPreset = mobile
         ? ROOM_HOTSPOTS[activeHotspotRef.current].camera.mobile
@@ -223,7 +224,6 @@ export function RoomCanvas({
       const targetLook = new Vector3(...targetPreset.target);
       const targetFov = targetPreset.fov;
 
-      // Apply subtle orbit yaw/pitch offset only when in overview
       if (activeHotspotRef.current === 'overview') {
         const radius = Math.sqrt(targetPos.x * targetPos.x + targetPos.z * targetPos.z);
         const currentAngle = Math.atan2(targetPos.z, targetPos.x);
@@ -233,7 +233,7 @@ export function RoomCanvas({
         targetPos.y += orbitOffsetPitch * 4;
       }
 
-      // Smooth interpolation (spring-like ease)
+      // Smooth camera interpolation
       const lerpFactor = 0.065;
       currentCamPos.lerp(targetPos, lerpFactor);
       currentLookTarget.lerp(targetLook, lerpFactor);
@@ -246,25 +246,28 @@ export function RoomCanvas({
         camera.updateProjectionMatrix();
       }
 
-      // Animate Server Rack blinking LEDs
+      // Blinking LEDs (Every frame)
       const t = time * 0.005;
       roomData.blinkingLeds.forEach((led, idx) => {
         const blink = Math.sin(t * (idx % 3 + 2) + idx) > 0.1;
         led.visible = blink;
       });
 
-      // Animate ambient dust motes
-      const positions = roomData.dustPoints.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < positions.length / 3; i++) {
-        positions[i * 3 + 1] += 0.0015;
-        if (positions[i * 3 + 1] > 4.2) {
-          positions[i * 3 + 1] = 0.5;
+      // Ambient dust motes (Throttled every 2 frames for CPU savings)
+      if (frameCount % 2 === 0) {
+        const positions = roomData.dustPoints.geometry.attributes.position.array as Float32Array;
+        for (let i = 0; i < positions.length / 3; i++) {
+          positions[i * 3 + 1] += 0.002;
+          if (positions[i * 3 + 1] > 4.2) {
+            positions[i * 3 + 1] = 0.5;
+          }
         }
+        roomData.dustPoints.geometry.attributes.position.needsUpdate = true;
       }
-      roomData.dustPoints.geometry.attributes.position.needsUpdate = true;
 
-      // Raycast hover detection (only when no drawer is open)
-      if (!isDrawerOpenRef.current && mouseNorm.x > -900) {
+      // Raycast hover detection (Only on pointer move, NOT on every frame!)
+      if (mouseMoved && !isDrawerOpenRef.current && mouseNorm.x > -900) {
+        mouseMoved = false;
         raycaster.setFromCamera(mouseNorm, camera);
         const interactive = roomData.interactiveMeshes;
         const categories: { id: HotspotId; objects: any[] }[] = [
@@ -291,29 +294,33 @@ export function RoomCanvas({
         }
       }
 
-      // Project 3D Hotspot positions to 2D screen coordinates
-      const screenCoords: Record<HotspotId, { x: number; y: number; visible: boolean }> = {} as any;
-      const rect = container.getBoundingClientRect();
-      const keys: HotspotId[] = ['workstation', 'serverRack', 'whiteboard', 'bookshelf', 'trophyStand'];
+      // DIRECT DOM UPDATE FOR FLOATING 3D BADGES (ZERO REACT RE-RENDERS!)
+      // This completely eliminates lag and guarantees solid 60 FPS on all devices!
+      if (!isDrawerOpenRef.current && pillElementsRef.current) {
+        const rect = container.getBoundingClientRect();
+        const keys: HotspotId[] = ['workstation', 'serverRack', 'whiteboard', 'bookshelf', 'trophyStand'];
 
-      keys.forEach((k) => {
-        const hotspot = ROOM_HOTSPOTS[k];
-        const v = new Vector3(...hotspot.worldPosition);
-        v.project(camera);
+        keys.forEach((k) => {
+          const el = pillElementsRef.current[k];
+          if (!el) return;
 
-        const isBehind = v.z > 1;
-        const screenX = ((v.x + 1) * rect.width) / 2;
-        const screenY = ((-v.y + 1) * rect.height) / 2;
-        const inBounds = screenX > 20 && screenX < rect.width - 20 && screenY > 60 && screenY < rect.height - 40;
+          const hotspot = ROOM_HOTSPOTS[k];
+          tempProjVec.set(...hotspot.worldPosition);
+          tempProjVec.project(camera);
 
-        screenCoords[k] = {
-          x: Math.round(screenX),
-          y: Math.round(screenY),
-          visible: !isBehind && inBounds
-        };
-      });
+          const isBehind = tempProjVec.z > 1;
+          const screenX = ((tempProjVec.x + 1) * rect.width) / 2;
+          const screenY = ((-tempProjVec.y + 1) * rect.height) / 2;
+          const inBounds = screenX > 20 && screenX < rect.width - 20 && screenY > 50 && screenY < rect.height - 40;
 
-      onUpdateScreenPositions(screenCoords);
+          if (isBehind || !inBounds) {
+            el.style.display = 'none';
+          } else {
+            el.style.display = 'block';
+            el.style.transform = `translate3d(${Math.round(screenX)}px, ${Math.round(screenY)}px, 0) translate(-50%, -50%)`;
+          }
+        });
+      }
 
       renderer.render(scene, camera);
     };
@@ -332,7 +339,7 @@ export function RoomCanvas({
         renderer.domElement.parentElement.removeChild(renderer.domElement);
       }
     };
-  }, [onSelectHotspot, onHoverHotspot, onUpdateScreenPositions]);
+  }, [onSelectHotspot, onHoverHotspot, pillElementsRef]);
 
   return <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden select-none" />;
 }

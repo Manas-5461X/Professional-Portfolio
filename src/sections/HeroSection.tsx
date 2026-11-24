@@ -48,7 +48,7 @@ export function HeroSection() {
 
           <Link
             to="/room"
-            className="pill"
+            className="pill hidden md:inline-flex"
             title="Step into interactive 3D engineering lab"
           >
             <span className="dot bg-[var(--signal)]" /> 3D Room <span className="arrow">&#8599;</span>

@@ -22,7 +22,6 @@ export interface HotspotMeta {
   description: string;
   badge: string;
   iconName: string;
-  /** Center in 3D world space for the floating badge */
   worldPosition: Vector3Tuple;
   camera: {
     desktop: CameraPreset;
@@ -33,16 +32,16 @@ export interface HotspotMeta {
 export const ROOM_HOTSPOTS: Record<HotspotId, HotspotMeta> = {
   overview: {
     id: 'overview',
-    label: 'Room Overview',
+    label: 'Cyber Lab Overview',
     shortLabel: 'Overview',
     category: '3D Space',
     description: 'Isometric view of Manas Gandhi’s engineering workspace & security lab.',
     badge: 'Overview',
     iconName: 'Cube',
-    worldPosition: [0, 1.2, 0],
+    worldPosition: [0, 1.4, 0],
     camera: {
-      desktop: { position: [9.2, 8.2, 9.2], target: [0.2, 1.1, 0.1], fov: 36 },
-      mobile: { position: [11.5, 10.5, 11.5], target: [0.2, 1.2, 0.1], fov: 42 }
+      desktop: { position: [9.0, 7.8, 9.0], target: [0.2, 1.2, 0.1], fov: 36 },
+      mobile: { position: [11.0, 10.0, 11.0], target: [0.2, 1.2, 0.1], fov: 42 }
     }
   },
   workstation: {
@@ -50,13 +49,13 @@ export const ROOM_HOTSPOTS: Record<HotspotId, HotspotMeta> = {
     label: 'Engineer Workstation',
     shortLabel: 'Workstation',
     category: 'Projects',
-    description: 'Dual-monitor dev station running CodeForensics AST & DPI Engine capture.',
+    description: 'Dual-monitor setup running CodeForensics AST & DPI Engine packet streams.',
     badge: 'Flagship Projects',
     iconName: 'Desktop',
-    worldPosition: [2.9, 1.8, -2.8],
+    worldPosition: [2.8, 1.8, -2.5],
     camera: {
-      desktop: { position: [1.6, 2.6, 1.2], target: [3.1, 1.6, -2.8], fov: 33 },
-      mobile: { position: [2.0, 3.2, 2.4], target: [3.1, 1.6, -2.8], fov: 38 }
+      desktop: { position: [1.6, 2.5, 1.1], target: [2.9, 1.6, -2.5], fov: 33 },
+      mobile: { position: [2.0, 3.2, 2.2], target: [2.9, 1.6, -2.5], fov: 38 }
     }
   },
   serverRack: {
@@ -64,27 +63,27 @@ export const ROOM_HOTSPOTS: Record<HotspotId, HotspotMeta> = {
     label: 'Systems & Security Rack',
     shortLabel: 'Server Rack',
     category: 'Systems & DPI',
-    description: '19” rack with blinking packet inspection switch & DPI Engine v2.0 terminal.',
+    description: '19” rack with blinking packet inspection switch & DPI Engine terminal.',
     badge: '26★ DPI Engine',
     iconName: 'HardDrives',
-    worldPosition: [3.8, 2.2, 1.4],
+    worldPosition: [3.8, 2.2, 1.3],
     camera: {
-      desktop: { position: [5.8, 2.7, 4.4], target: [3.7, 1.6, 1.4], fov: 32 },
-      mobile: { position: [6.4, 3.2, 5.2], target: [3.7, 1.6, 1.4], fov: 37 }
+      desktop: { position: [5.6, 2.6, 4.2], target: [3.6, 1.6, 1.3], fov: 32 },
+      mobile: { position: [6.2, 3.2, 5.0], target: [3.6, 1.6, 1.3], fov: 37 }
     }
   },
   whiteboard: {
     id: 'whiteboard',
-    label: 'Architecture Whiteboard',
-    shortLabel: 'Whiteboard',
-    category: 'Architecture',
-    description: 'System design diagrams for packet inspection pipelines & AST archaeology.',
-    badge: 'System Design',
+    label: 'DSA & Packet Analysis',
+    shortLabel: 'DSA & Analysis',
+    category: 'Algorithms & Security',
+    description: 'Packet filtering pipelines, LeetCode patterns, and security inspection notes.',
+    badge: 'DSA & Security',
     iconName: 'TreeStructure',
-    worldPosition: [-4.0, 2.3, -0.6],
+    worldPosition: [-3.8, 2.3, -0.6],
     camera: {
-      desktop: { position: [1.8, 2.4, 1.6], target: [-4.0, 2.3, -0.6], fov: 33 },
-      mobile: { position: [2.4, 2.8, 2.2], target: [-4.0, 2.3, -0.6], fov: 38 }
+      desktop: { position: [1.6, 2.4, 1.4], target: [-3.8, 2.3, -0.6], fov: 33 },
+      mobile: { position: [2.2, 2.8, 2.0], target: [-3.8, 2.3, -0.6], fov: 38 }
     }
   },
   bookshelf: {
@@ -95,10 +94,10 @@ export const ROOM_HOTSPOTS: Record<HotspotId, HotspotMeta> = {
     description: 'Classical CS texts (Networks, OS, CLRS), BITS Pilani diploma & skills index.',
     badge: 'BITS Pilani CS',
     iconName: 'BookOpen',
-    worldPosition: [1.3, 2.5, -3.9],
+    worldPosition: [1.2, 2.5, -3.8],
     camera: {
-      desktop: { position: [1.3, 2.6, -0.8], target: [1.3, 2.3, -3.9], fov: 32 },
-      mobile: { position: [1.3, 3.0, 0.4], target: [1.3, 2.3, -3.9], fov: 37 }
+      desktop: { position: [1.2, 2.6, -0.7], target: [1.2, 2.3, -3.8], fov: 32 },
+      mobile: { position: [1.2, 3.0, 0.4], target: [1.2, 2.3, -3.8], fov: 37 }
     }
   },
   trophyStand: {
@@ -111,8 +110,8 @@ export const ROOM_HOTSPOTS: Record<HotspotId, HotspotMeta> = {
     iconName: 'Trophy',
     worldPosition: [1.6, 1.3, 2.4],
     camera: {
-      desktop: { position: [3.4, 2.0, 4.6], target: [1.6, 0.9, 2.4], fov: 31 },
-      mobile: { position: [4.0, 2.4, 5.4], target: [1.6, 0.9, 2.4], fov: 36 }
+      desktop: { position: [3.3, 2.0, 4.4], target: [1.6, 0.9, 2.4], fov: 31 },
+      mobile: { position: [3.8, 2.4, 5.2], target: [1.6, 0.9, 2.4], fov: 36 }
     }
   }
 };
