@@ -40,7 +40,7 @@ const fragmentSource = `
   float fbm(vec2 p) {
     float v = 0.0;
     float a = 0.5;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
       v += a * noise(p);
       p *= 2.02;
       a *= 0.5;
@@ -67,7 +67,9 @@ const fragmentSource = `
 
     float fade = smoothstep(0.0, 0.35, uv.y) * (0.55 + 0.45 * smoothstep(1.0, 0.55, uv.y));
     vec3 col = mix(uInk, uAccent, lens * 0.9 * step(0.5, fract(bands * 0.5)));
-    gl_FragColor = vec4(col, c * fade * (0.26 + lens * 0.4));
+    float alpha = clamp(c * fade * (0.26 + lens * 0.4), 0.0, 1.0);
+    // Premultiply RGB by alpha so default premultipliedAlpha:true WebGL compositing stays transparent where alpha = 0
+    gl_FragColor = vec4(col * alpha, alpha);
   }
 `;
 
@@ -93,12 +95,14 @@ export function FieldBackground() {
     ink: hexToRgb(ink),
     accent: hexToRgb(accent)
   });
+  const kickRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     colorsRef.current = {
       ink: hexToRgb(ink),
       accent: hexToRgb(accent)
     };
+    kickRef.current?.();
   }, [ink, accent]);
 
   useEffect(() => {
@@ -115,6 +119,7 @@ export function FieldBackground() {
 
     const gl = canvas.getContext('webgl', {
       alpha: true,
+      premultipliedAlpha: true,
       antialias: false,
       depth: false,
       stencil: false,
@@ -124,23 +129,48 @@ export function FieldBackground() {
     if (!gl) return;
     el.appendChild(canvas);
 
-    // Create shader program
-    const vertShader = gl.createShader(gl.VERTEX_SHADER);
-    if (!vertShader) return;
-    gl.shaderSource(vertShader, vertexSource);
-    gl.compileShader(vertShader);
+    const compile = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    };
 
-    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    if (!fragShader) return;
-    gl.shaderSource(fragShader, fragmentSource);
-    gl.compileShader(fragShader);
+    const vertShader = compile(gl.VERTEX_SHADER, vertexSource);
+    const fragShader = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vertShader || !fragShader) {
+      if (vertShader) gl.deleteShader(vertShader);
+      if (fragShader) gl.deleteShader(fragShader);
+      canvas.remove();
+      return;
+    }
 
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) {
+      gl.deleteShader(vertShader);
+      gl.deleteShader(fragShader);
+      canvas.remove();
+      return;
+    }
     gl.attachShader(program, vertShader);
     gl.attachShader(program, fragShader);
     gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      gl.deleteShader(vertShader);
+      gl.deleteShader(fragShader);
+      canvas.remove();
+      return;
+    }
     gl.useProgram(program);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.clearColor(0, 0, 0, 0);
 
     // Full screen quad buffer
     const buffer = gl.createBuffer();
@@ -172,20 +202,19 @@ export function FieldBackground() {
     let targetMouseY = 0.6;
     let currentVel = 0;
 
-    let cachedWidth = 1;
-    let cachedHeight = 1;
+    let cachedRect = el.getBoundingClientRect();
 
-    // Use 1.0 pixel ratio (or 0.85 on simple devices) for smooth 60fps without heating
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.0);
+    const lowTier = (navigator.hardwareConcurrency || 4) <= 4 || window.matchMedia('(pointer: coarse)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, lowTier ? 1.0 : 1.25);
 
     const resize = () => {
-      const rect = el.getBoundingClientRect();
-      cachedWidth = Math.max(1, rect.width);
-      cachedHeight = Math.max(1, rect.height);
-      canvas.width = Math.round(cachedWidth * dpr);
-      canvas.height = Math.round(cachedHeight * dpr);
+      cachedRect = el.getBoundingClientRect();
+      const w = Math.max(1, cachedRect.width);
+      const h = Math.max(1, cachedRect.height);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(uResLoc, cachedWidth, cachedHeight);
+      gl.uniform2f(uResLoc, w, h);
     };
 
     resize();
@@ -193,10 +222,9 @@ export function FieldBackground() {
     ro.observe(el);
 
     const onPointerMove = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        targetMouseX = (e.clientX - rect.left) / rect.width;
-        targetMouseY = 1.0 - (e.clientY - rect.top) / rect.height;
+      if (cachedRect.width > 0 && cachedRect.height > 0) {
+        targetMouseX = (e.clientX - cachedRect.left) / cachedRect.width;
+        targetMouseY = 1.0 - (e.clientY - cachedRect.top) / cachedRect.height;
       }
     };
     window.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -209,7 +237,7 @@ export function FieldBackground() {
       rafId = 0;
       if (!isVisible || document.hidden) return;
 
-      const elapsed = (performance.now() - startTime) / 1000;
+      const elapsed = isReducedMotion() ? 12 : (performance.now() - startTime) / 1000;
       gl.uniform1f(uTimeLoc, elapsed);
 
       const targetVel = (scrollState.velocity || 0) * 8;
@@ -224,6 +252,7 @@ export function FieldBackground() {
       gl.uniform3f(uInkLoc, inkRgb[0], inkRgb[1], inkRgb[2]);
       gl.uniform3f(uAccentLoc, accentRgb[0], accentRgb[1], accentRgb[2]);
 
+      gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       if (!isReducedMotion()) {
@@ -236,6 +265,7 @@ export function FieldBackground() {
         rafId = requestAnimationFrame(render);
       }
     };
+    kickRef.current = kick;
 
     const io = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
@@ -246,6 +276,7 @@ export function FieldBackground() {
     kick();
 
     return () => {
+      kickRef.current = null;
       cancelAnimationFrame(rafId);
       io.disconnect();
       ro.disconnect();
