@@ -1,16 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { isReducedMotion, isCoarsePointer } from '../lib/smooth';
 
 export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement | null>(null);
-  const [cursorText, setCursorText] = useState<string>('');
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [isInput, setIsInput] = useState<boolean>(false);
-
-  const isInputRef = useRef(false);
-  const isHoveredRef = useRef(false);
-  const cursorTextRef = useRef('');
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const textRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || isReducedMotion() || isCoarsePointer()) {
@@ -18,52 +12,83 @@ export function CustomCursor() {
     }
 
     const cursorEl = cursorRef.current;
-    if (!cursorEl) return;
+    const innerEl = innerRef.current;
+    const textEl = textRef.current;
+    if (!cursorEl || !innerEl) return;
 
     let mouseX = -100;
     let mouseY = -100;
     let currentX = -100;
     let currentY = -100;
     let rafId = 0;
+    let isVisible = false;
+    let isInput = false;
+    let isHovered = false;
+    let cursorText = '';
+
+    const updateVisibility = () => {
+      cursorEl.style.opacity = isVisible && !isInput ? '1' : '0';
+    };
+
+    const updateShape = () => {
+      if (cursorText) {
+        innerEl.className = 'flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out h-20 w-20 shadow-2xl scale-100';
+        if (textEl) {
+          textEl.textContent = cursorText;
+          textEl.style.display = 'block';
+        }
+      } else if (isHovered) {
+        innerEl.className = 'flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out h-8 w-8 scale-100';
+        if (textEl) textEl.style.display = 'none';
+      } else {
+        innerEl.className = 'flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out h-3.5 w-3.5 scale-100';
+        if (textEl) textEl.style.display = 'none';
+      }
+    };
 
     const onMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      if (!isVisible) setIsVisible(true);
+      if (!isVisible) {
+        isVisible = true;
+        updateVisibility();
+      }
 
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      const isInputField = Boolean(
+      const nextInput = Boolean(
         target.closest('input, textarea, select, .monaco-editor, [contenteditable="true"]')
       );
-      if (isInputField !== isInputRef.current) {
-        isInputRef.current = isInputField;
-        setIsInput(isInputField);
+      if (nextInput !== isInput) {
+        isInput = nextInput;
+        updateVisibility();
       }
 
       const interactive = Boolean(
         target.closest('a, button, [role="button"], summary, [data-cursor], .pill, .chip, .row, .li-card')
       );
-      if (interactive !== isHoveredRef.current) {
-        isHoveredRef.current = interactive;
-        setIsHovered(interactive);
+      if (interactive !== isHovered) {
+        isHovered = interactive;
+        updateShape();
       }
 
       const cursorTarget = target.closest<HTMLElement>('[data-cursor]');
       const nextText = cursorTarget?.dataset.cursor || '';
-      if (nextText !== cursorTextRef.current) {
-        cursorTextRef.current = nextText;
-        setCursorText(nextText);
+      if (nextText !== cursorText) {
+        cursorText = nextText;
+        updateShape();
       }
     };
 
     const onMouseLeave = () => {
-      setIsVisible(false);
+      isVisible = false;
+      updateVisibility();
     };
 
     const onMouseEnter = () => {
-      setIsVisible(true);
+      isVisible = true;
+      updateVisibility();
     };
 
     const animate = () => {
@@ -86,41 +111,32 @@ export function CustomCursor() {
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
     };
-  }, [isVisible]);
+  }, []);
 
   if (typeof window !== 'undefined' && (isReducedMotion() || isCoarsePointer())) {
     return null;
   }
-
-  const isBadge = Boolean(cursorText);
 
   return (
     <div
       ref={cursorRef}
       data-html2canvas-ignore=""
       aria-hidden="true"
-      className={`custom-cursor pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-200 ${
-        isVisible && !isInput ? 'opacity-100' : 'opacity-0'
-      }`}
+      className="custom-cursor pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-200 opacity-0"
       style={{
         willChange: 'transform',
         mixBlendMode: 'difference'
       }}
     >
       <div
-        className={`flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out ${
-          isBadge
-            ? 'h-20 w-20 shadow-2xl scale-100'
-            : isHovered
-              ? 'h-8 w-8 scale-100'
-              : 'h-3.5 w-3.5 scale-100'
-        }`}
+        ref={innerRef}
+        className="flex items-center justify-center rounded-full bg-white transition-all duration-200 ease-out h-3.5 w-3.5 scale-100"
       >
-        {isBadge && (
-          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-black select-none text-center px-2">
-            {cursorText}
-          </span>
-        )}
+        <span
+          ref={textRef}
+          style={{ display: 'none' }}
+          className="font-mono text-[10px] font-bold uppercase tracking-wider text-black select-none text-center px-2"
+        />
       </div>
     </div>
   );

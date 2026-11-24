@@ -48,7 +48,7 @@ export function initSmoothScroll(): () => void {
   };
 
   gsap.ticker.add(tickerCallback);
-  gsap.ticker.lagSmoothing(0);
+  gsap.ticker.lagSmoothing(500, 33);
 
   return () => {
     if (tickerCallback) {

@@ -77,8 +77,8 @@ export function RoomCanvas({
         alpha: false,
         powerPreference: 'high-performance'
       });
-      // Cap pixel ratio to 1.25 on simple devices for high 60fps performance without heating
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+      // Cap pixel ratio to 1.0 on standard devices for buttery smooth 60fps
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = PCFSoftShadowMap;
@@ -87,6 +87,8 @@ export function RoomCanvas({
       console.error('WebGL init failed:', e);
       return;
     }
+
+    let cachedRect = container.getBoundingClientRect();
 
     const updateClearColor = (dark: boolean) => {
       // Sleek modern graphite backdrop in dark mode
@@ -98,12 +100,12 @@ export function RoomCanvas({
     const ambientLight = new AmbientLight(isDarkRef.current ? 0x3d394a : 0xfffaee, isDarkRef.current ? 1.4 : 1.2);
     scene.add(ambientLight);
 
-    // Directional sunlight / moon fill
+    // Directional sunlight / moon fill (optimized 512 map for zero stutter)
     const sunDirLight = new DirectionalLight(isDarkRef.current ? 0x93c5fd : 0xfff7ed, isDarkRef.current ? 1.0 : 1.8);
     sunDirLight.position.set(6, 12, 7);
     sunDirLight.castShadow = true;
-    sunDirLight.shadow.mapSize.width = 1024;
-    sunDirLight.shadow.mapSize.height = 1024;
+    sunDirLight.shadow.mapSize.width = 512;
+    sunDirLight.shadow.mapSize.height = 512;
     sunDirLight.shadow.camera.near = 0.5;
     sunDirLight.shadow.camera.far = 25;
     const shadowD = 5.5;
@@ -142,9 +144,8 @@ export function RoomCanvas({
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      const rect = container.getBoundingClientRect();
-      mouseNorm.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseNorm.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseNorm.x = ((e.clientX - cachedRect.left) / cachedRect.width) * 2 - 1;
+      mouseNorm.y = -((e.clientY - cachedRect.top) / cachedRect.height) * 2 + 1;
       mouseMoved = true;
 
       if (isDragging && activeHotspotRef.current === 'overview') {
@@ -165,10 +166,9 @@ export function RoomCanvas({
     const onClick = (e: MouseEvent) => {
       if ((e.target as HTMLElement).closest('.room-ui-overlay')) return;
 
-      const rect = container.getBoundingClientRect();
       const clickNorm = new Vector2(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        -((e.clientY - rect.top) / rect.height) * 2 + 1
+        ((e.clientX - cachedRect.left) / cachedRect.width) * 2 - 1,
+        -((e.clientY - cachedRect.top) / cachedRect.height) * 2 + 1
       );
       raycaster.setFromCamera(clickNorm, camera);
 
@@ -197,8 +197,9 @@ export function RoomCanvas({
 
     const onResize = () => {
       if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      cachedRect = container.getBoundingClientRect();
+      const w = cachedRect.width;
+      const h = cachedRect.height;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -246,24 +247,16 @@ export function RoomCanvas({
         camera.updateProjectionMatrix();
       }
 
-      // Blinking LEDs (Every frame)
-      const t = time * 0.005;
-      roomData.blinkingLeds.forEach((led, idx) => {
-        const blink = Math.sin(t * (idx % 3 + 2) + idx) > 0.1;
-        led.visible = blink;
-      });
-
-      // Ambient dust motes (Throttled every 2 frames for CPU savings)
-      if (frameCount % 2 === 0) {
-        const positions = roomData.dustPoints.geometry.attributes.position.array as Float32Array;
-        for (let i = 0; i < positions.length / 3; i++) {
-          positions[i * 3 + 1] += 0.002;
-          if (positions[i * 3 + 1] > 4.2) {
-            positions[i * 3 + 1] = 0.5;
-          }
-        }
-        roomData.dustPoints.geometry.attributes.position.needsUpdate = true;
+      // Blinking LEDs (Throttled every 3 frames)
+      if (frameCount % 3 === 0) {
+        const t = time * 0.005;
+        roomData.blinkingLeds.forEach((led, idx) => {
+          led.visible = Math.sin(t * (idx % 3 + 2) + idx) > 0.1;
+        });
       }
+
+      // Ambient dust motes (GPU transform rotation, zero CPU buffer writes!)
+      roomData.dustPoints.rotation.y = time * 0.0001;
 
       // Raycast hover detection (Only on pointer move, NOT on every frame!)
       if (mouseMoved && !isDrawerOpenRef.current && mouseNorm.x > -900) {
@@ -294,10 +287,8 @@ export function RoomCanvas({
         }
       }
 
-      // DIRECT DOM UPDATE FOR FLOATING 3D BADGES (ZERO REACT RE-RENDERS!)
-      // This completely eliminates lag and guarantees solid 60 FPS on all devices!
+      // DIRECT DOM UPDATE FOR FLOATING 3D BADGES (ZERO REACT RE-RENDERS & ZERO REFLOWS!)
       if (!isDrawerOpenRef.current && pillElementsRef.current) {
-        const rect = container.getBoundingClientRect();
         const keys: HotspotId[] = ['workstation', 'serverRack', 'whiteboard', 'bookshelf', 'trophyStand'];
 
         keys.forEach((k) => {
@@ -309,9 +300,9 @@ export function RoomCanvas({
           tempProjVec.project(camera);
 
           const isBehind = tempProjVec.z > 1;
-          const screenX = ((tempProjVec.x + 1) * rect.width) / 2;
-          const screenY = ((-tempProjVec.y + 1) * rect.height) / 2;
-          const inBounds = screenX > 20 && screenX < rect.width - 20 && screenY > 50 && screenY < rect.height - 40;
+          const screenX = ((tempProjVec.x + 1) * cachedRect.width) / 2;
+          const screenY = ((-tempProjVec.y + 1) * cachedRect.height) / 2;
+          const inBounds = screenX > 20 && screenX < cachedRect.width - 20 && screenY > 50 && screenY < cachedRect.height - 40;
 
           if (isBehind || !inBounds) {
             el.style.display = 'none';

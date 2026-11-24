@@ -243,13 +243,9 @@ export function buildRoom(isDark: boolean): RoomBuildResult {
   overheadGroup.add(wire1, wire2);
   group.add(overheadGroup);
 
-  // Overhead Studio Light (fills the room with warm glow)
+  // Overhead Studio Light (fills the room with warm glow, zero heavy shadow cubemap passes)
   const overheadLight = new PointLight(0xffe8cf, isDark ? 3.5 : 2.2, 10.0);
   overheadLight.position.set(1.5, 4.1, -1.0);
-  overheadLight.castShadow = true;
-  overheadLight.shadow.mapSize.width = 1024;
-  overheadLight.shadow.mapSize.height = 1024;
-  overheadLight.shadow.bias = -0.001;
   group.add(overheadLight);
 
   // -------------------------------------------------------------

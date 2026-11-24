@@ -27,40 +27,21 @@ export function HomePage() {
   useEffect(() => {
     const refreshTimer = window.setTimeout(() => {
       ScrollTrigger.refresh();
-    }, 200);
-    const secondTimer = window.setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 800);
+    }, 350);
     return () => {
       window.clearTimeout(refreshTimer);
-      window.clearTimeout(secondTimer);
     };
   }, []);
 
   useEffect(() => {
     if (location.hash) {
       const target = location.hash;
-      ScrollTrigger.refresh();
-      scrollToElement(target, -84, true);
-      const timer1 = window.setTimeout(() => {
-        ScrollTrigger.refresh();
+      const timer = window.setTimeout(() => {
         scrollToElement(target, -84, true);
-      }, 80);
-      const timer2 = window.setTimeout(() => {
-        ScrollTrigger.refresh();
-        scrollToElement(target, -84, true);
-      }, 300);
-      return () => {
-        window.clearTimeout(timer1);
-        window.clearTimeout(timer2);
-      };
+      }, 100);
+      return () => window.clearTimeout(timer);
     } else {
       scrollToTopImmediate();
-      ScrollTrigger.refresh();
-      const timer = window.setTimeout(() => {
-        scrollToTopImmediate();
-      }, 50);
-      return () => window.clearTimeout(timer);
     }
   }, [location.pathname, location.hash]);
 

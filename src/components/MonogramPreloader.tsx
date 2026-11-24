@@ -61,24 +61,24 @@ export function MonogramPreloader() {
       }
     });
 
-    // 1. Draw SVG monogram strokes (0.45s)
+    // 1. Draw SVG monogram strokes (0.35s)
     tl.to(pathRefs.current.filter(Boolean), {
       strokeDashoffset: 0,
-      duration: 0.45,
-      stagger: 0.035,
+      duration: 0.35,
+      stagger: 0.025,
       ease: 'power2.out'
     })
       // 2. Pop signal beacon dot
       .fromTo(
         dotRef.current,
         { scale: 0, opacity: 0, transformOrigin: 'center' },
-        { scale: 1, opacity: 1, duration: 0.22, ease: 'back.out(2.5)' },
-        '-=0.12'
+        { scale: 1, opacity: 1, duration: 0.18, ease: 'back.out(2.5)' },
+        '-=0.1'
       )
       // 3. Hairline progress bar expands
       .to(
         barRef.current,
-        { scaleX: 1, duration: 0.5, ease: 'power2.inOut' },
+        { scaleX: 1, duration: 0.38, ease: 'power2.inOut' },
         0
       )
       // 4. Elegant curtain reveal: slides up cleanly into live hero
@@ -86,17 +86,14 @@ export function MonogramPreloader() {
         root,
         {
           clipPath: 'inset(0% 0% 100% 0%)',
-          duration: 0.45,
+          duration: 0.35,
           ease: 'expo.inOut'
         },
-        '+=0.12'
+        '+=0.08'
       );
 
-    // Fast resolution: sync with fonts ready or cap at max 750ms so user is never blocked
-    const fontsReady = (document as any).fonts?.ready ?? Promise.resolve();
-    Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 750))]).then(() => {
-      tl.play();
-    });
+    // Start instantly so startup is snappy and never feels laggy
+    tl.play();
 
     // Escape key bypass
     const onKeyDown = (e: KeyboardEvent) => {
