@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Cube,
@@ -16,8 +16,8 @@ import {
 } from '@phosphor-icons/react';
 import { useTheme } from '../hooks/useTheme';
 import { useMeta } from '../hooks/useMeta';
-import { RoomCanvas } from './RoomCanvas';
-import { HotspotId, ROOM_HOTSPOTS } from './roomHotspots';
+// import { RoomCanvas } from './RoomCanvas'; // 3D Room Canvas commented out as requested
+import { HotspotId } from './roomHotspots';
 import { ProjectsDrawer } from './drawers/ProjectsDrawer';
 import { SystemsDrawer } from './drawers/SystemsDrawer';
 import { ArchitectureDrawer } from './drawers/ArchitectureDrawer';
@@ -37,19 +37,11 @@ export function RoomPage() {
   });
 
   const [activeHotspot, setActiveHotspot] = useState<HotspotId>('overview');
-  const [hoveredHotspot, setHoveredHotspot] = useState<HotspotId | null>(null);
+  // 3D Canvas state commented out:
+  // const [hoveredHotspot, setHoveredHotspot] = useState<HotspotId | null>(null);
+  // const pillElementsRef = useRef<Record<HotspotId, HTMLDivElement | null>>({...});
   const [isMobileScreen, setIsMobileScreen] = useState<boolean>(() => {
     return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-  });
-
-  // Direct DOM references for floating 3D badge pills (Zero React re-render overhead!)
-  const pillElementsRef = useRef<Record<HotspotId, HTMLDivElement | null>>({
-    overview: null,
-    workstation: null,
-    serverRack: null,
-    whiteboard: null,
-    bookshelf: null,
-    trophyStand: null
   });
 
   useEffect(() => {
@@ -59,8 +51,6 @@ export function RoomPage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const isDrawerOpen = activeHotspot !== 'overview';
 
   const handleSelectHotspot = useCallback((id: HotspotId) => {
     setActiveHotspot(id);
@@ -123,7 +113,7 @@ export function RoomPage() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[var(--bg)] text-[var(--fg)] select-none font-sans">
-      {/* 1. High-Performance Three.js Canvas */}
+      {/* 3D Room Canvas rendering commented out as requested (uncomment to restore):
       <RoomCanvas
         isDark={isDark}
         activeHotspot={activeHotspot}
@@ -132,46 +122,26 @@ export function RoomPage() {
         pillElementsRef={pillElementsRef}
         isDrawerOpen={isDrawerOpen}
       />
+      */}
 
-      {/* 2. Floating 3D Hotspot Badges (Updated directly via DOM refs - ZERO re-renders!) */}
+      {/* 2. Floating 3D Hotspot Badges (Commented out with 3D Room)
       {!isDrawerOpen && (
         <div className="absolute inset-0 pointer-events-none z-20">
-          {(['workstation', 'serverRack', 'whiteboard', 'bookshelf', 'trophyStand'] as HotspotId[]).map((key) => {
-            const meta = ROOM_HOTSPOTS[key];
-            const isHovered = hoveredHotspot === key;
-
-            return (
-              <div
-                key={key}
-                ref={(el) => {
-                  pillElementsRef.current[key] = el;
-                }}
-                style={{ display: 'none' }}
-                className="absolute pointer-events-auto transition-transform duration-100 will-change-transform"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleSelectHotspot(key)}
-                  className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full backdrop-blur-md border shadow-lg transition-all duration-200 cursor-pointer ${
-                    isHovered
-                      ? 'bg-[var(--signal)] text-[var(--accent-fg)] border-[var(--signal)] scale-110 ring-4 ring-[var(--accent-tint)]'
-                      : 'bg-[var(--surface-elevated)]/90 text-[var(--fg)] border-[var(--line-strong)] hover:border-[var(--signal)] hover:scale-105'
-                  }`}
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      isHovered ? 'bg-white animate-pulse' : 'bg-[var(--signal)]'
-                    }`}
-                  />
-                  <span className="font-mono text-xs font-semibold tracking-wide whitespace-nowrap">
-                    {meta.badge}
-                  </span>
-                </button>
-              </div>
-            );
-          })}
+          ...
         </div>
       )}
+      */}
+
+      {/* Fallback view when 3D Room Canvas is paused */}
+      <div className="flex flex-col items-center justify-center h-full text-center px-6">
+        <h2 className="text-3xl font-serif italic mb-3">3D Developer Lab</h2>
+        <p className="text-[var(--muted)] text-sm max-w-md mb-6 font-mono">
+          3D room rendering is paused for maximum device performance.
+        </p>
+        <Link to="/" className="pill solid">
+          Return to 2D Portfolio
+        </Link>
+      </div>
 
       {/* 3. Top Navigation Bar */}
       <header className="room-ui-overlay absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-3.5 bg-[var(--surface)]/85 backdrop-blur-md border-b border-[var(--line)]">

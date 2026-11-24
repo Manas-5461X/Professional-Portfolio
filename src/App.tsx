@@ -38,9 +38,10 @@ const ExploringPage = lazyWithRetry(() =>
 const NotFoundPage = lazyWithRetry(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
-const RoomPage = lazyWithRetry(() =>
-  import('./room/RoomPage').then((m) => ({ default: m.RoomPage }))
-);
+// 3D Room route paused as requested (uncomment to restore)
+// const RoomPage = lazyWithRetry(() =>
+//   import('./room/RoomPage').then((m) => ({ default: m.RoomPage }))
+// );
 
 import { useLocation } from 'react-router-dom';
 
@@ -57,8 +58,10 @@ function AppContent() {
             <Route path="/" element={<HomePage />} />
             <Route path="/projects/:slug" element={<ProjectCaseStudyPage />} />
             <Route path="/exploring" element={<ExploringPage />} />
+            {/* 3D Room routes commented out as requested (uncomment to restore):
             <Route path="/room" element={<RoomPage />} />
             <Route path="/workspace" element={<RoomPage />} />
+            */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

@@ -46,13 +46,14 @@ export function HeroSection() {
             <span className="dot" /> See the flagships
           </button>
 
-          <Link
+          {/* 3D Room button commented out as requested */}
+          {/* <Link
             to="/room"
             className="pill hidden md:inline-flex"
             title="Step into interactive 3D engineering lab"
           >
             <span className="dot bg-[var(--signal)]" /> 3D Room <span className="arrow">&#8599;</span>
-          </Link>
+          </Link> */}
 
           {/* Resume download hidden for now as requested */}
           {/* <a href="/resume.pdf" download className="pill">
