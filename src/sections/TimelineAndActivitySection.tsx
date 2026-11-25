@@ -423,49 +423,75 @@ export function TimelineAndActivitySection() {
 
     async function loadLeetCode() {
       try {
-        const CACHE_TTL_MS = 15 * 60 * 1000;
+        const CACHE_TTL_MS = 2 * 60 * 1000;
         const cached = sessionStorage.getItem('live_leetcode_stats');
         if (cached) {
           try {
             const parsed = JSON.parse(cached);
-            if (
-              parsed?.data?.totalSolved &&
-              Date.now() - (parsed.timestamp || 0) < CACHE_TTL_MS &&
-              !cancelled
-            ) {
+            const isFresh = parsed?.timestamp && Date.now() - parsed.timestamp < CACHE_TTL_MS;
+            const isNotStale =
+              parsed?.data?.totalSolved && parsed.data.totalSolved >= LEETCODE_BASELINE.totalSolved;
+            if (isFresh && isNotStale && !cancelled) {
               setLeetcode((prev) => ({ ...prev, ...parsed.data }));
               return;
             }
-          } catch {}
+            sessionStorage.removeItem('live_leetcode_stats');
+          } catch {
+            sessionStorage.removeItem('live_leetcode_stats');
+          }
         }
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
+        const handle = PROFILE.handle || 'Manas-5461X';
+        const endpoints = [
+          `https://leetcode-api-faisalshohag.vercel.app/${handle}`,
+          `https://leetcode-stats.tashif.codes/${handle}`,
+          `https://alfa-leetcode-api.onrender.com/userProfile/${handle}`
+        ];
 
-        const res = await fetch('https://alfa-leetcode-api.onrender.com/userProfile/Manas-5461X', {
-          signal: controller.signal
-        });
-        clearTimeout(timeout);
+        for (const url of endpoints) {
+          if (cancelled) return;
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 6000);
 
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.totalSolved && !cancelled) {
-            const updated: Partial<LeetCodeData> = {
-              totalSolved: json.totalSolved,
-              easySolved: json.easySolved ?? 97,
-              mediumSolved: json.mediumSolved ?? 55,
-              hardSolved: json.hardSolved ?? 5,
-              ranking: json.ranking ? `#${json.ranking.toLocaleString()}` : undefined
-            };
-            setLeetcode((prev) => ({ ...prev, ...updated }));
-            sessionStorage.setItem(
-              'live_leetcode_stats',
-              JSON.stringify({ data: updated, timestamp: Date.now() })
-            );
+          try {
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (!res.ok) continue;
+
+            const json = await res.json();
+            if (typeof json?.totalSolved === 'number' && json.totalSolved > 0) {
+              if (cancelled) return;
+              const updated: Partial<LeetCodeData> = {
+                totalSolved: Math.max(json.totalSolved, LEETCODE_BASELINE.totalSolved),
+                easySolved:
+                  json.totalSolved >= LEETCODE_BASELINE.totalSolved
+                    ? (json.easySolved ?? LEETCODE_BASELINE.easySolved)
+                    : LEETCODE_BASELINE.easySolved,
+                mediumSolved:
+                  json.totalSolved >= LEETCODE_BASELINE.totalSolved
+                    ? (json.mediumSolved ?? LEETCODE_BASELINE.mediumSolved)
+                    : LEETCODE_BASELINE.mediumSolved,
+                hardSolved:
+                  json.totalSolved >= LEETCODE_BASELINE.totalSolved
+                    ? (json.hardSolved ?? LEETCODE_BASELINE.hardSolved)
+                    : LEETCODE_BASELINE.hardSolved,
+                ranking: json.ranking ? `#${Number(json.ranking).toLocaleString()}` : undefined
+              };
+              setLeetcode((prev) => ({ ...prev, ...updated }));
+              try {
+                sessionStorage.setItem(
+                  'live_leetcode_stats',
+                  JSON.stringify({ data: updated, timestamp: Date.now() })
+                );
+              } catch {}
+              return;
+            }
+          } catch {
+            clearTimeout(timeout);
           }
         }
       } catch {
-        // Fallback to updated LEETCODE_BASELINE seamlessly
+        // Fallback to LEETCODE_BASELINE seamlessly
       }
     }
 
